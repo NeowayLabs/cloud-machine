@@ -1,0 +1,20 @@
+instance:
+  name: elasticsearch-node
+  type: r3.2xlarge
+  imageid: ami-85ada4b5
+  region: us-west-2
+  defaultavailablezone: us-west-2a
+  keyname: aws-keyname
+  securitygroups: [sg-00000000]
+  subnetid: subnet-abcd0000
+  cloudconfig: cloud-configs/elasticsearch-node.yaml
+  ebsoptimized: true
+
+volumes:
+  - name: es-data
+    type: io1
+    size: 300
+    iops: 1000
+    device: /dev/xvdk
+    mount: /es-data
+    filesystem: btrfs
