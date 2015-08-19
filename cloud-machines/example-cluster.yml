@@ -1,0 +1,14 @@
+clusters:
+  - default:
+    imageid: ami-f5a5a5c5
+    region: us-west-2
+    defaultavailablezone: us-west-2a
+    keyname: aws-keyname
+    securitygroups: [sg-00000000]
+    subnetid: subnet-abcd0000
+
+  - machine: ./cloud-machines/mongo-node.yml
+    nodes: 3
+
+  - machine: ./cloud-machines/elasticsearch-node.yml
+    nodes: 3

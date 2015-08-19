@@ -1,0 +1,51 @@
+#cloud-config
+
+coreos:
+  units:
+    - name: data.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount data drive to /data
+        Before=mongod.service
+        [Mount]
+        What=/dev/xvdk
+        Where=/mongo-data
+        Type=ext4
+        Options=defaults,noatime,noexec,nobarrier
+    - name: journal.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount journal drive to /journal
+        Before=mongod.service
+        [Mount]
+        What=/dev/xvdl
+        Where=/mongo-journal
+        Type=ext4
+        Options=defaults,noatime,noexec,nobarrier
+    - name: log.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount log drive to /log
+        Before=mongod.service
+        [Mount]
+        What=/dev/xvdm
+        Where=/mongo-log
+        Type=ext4
+        Options=defaults,noatime,noexec,nobarrier
+    - name: mongod.service
+      command: start
+      content: |
+        [Unit]
+        Description=MongoDB
+        [Service]
+        ExecStart=<EXECUTE YOUR MONGO>
+        User=core
+        Group=core
+        Restart=always
+        RestartSec=10
+  update:
+    group: stable
+    reboot-strategy: off

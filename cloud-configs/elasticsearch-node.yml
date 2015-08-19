@@ -1,0 +1,35 @@
+#cloud-config
+
+coreos:
+  units:
+    - name: data.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount data drive to /data
+        Before=elasticsearch.service
+        [Mount]
+        What=/dev/xvdk
+        Where=/es-data
+        Type=btrfs
+        Options=defaults,noatime,noexec,nobarrier
+    - name: etcd.service
+      mask: true
+    - name: fleet.service
+      mask: true
+    - name: elasticsearch.service
+      command: start
+      content: |
+        [Unit]
+        Description=Elastic Search
+        Requires=docker.service
+        After=docker.service
+        [Service]
+        User=core
+        Restart=always
+        TimeoutStartSec=0
+        RestartSec=5
+        ExecStart=<EXECUTE YOUR ELASTIC SEARCH>
+  update:
+    group: stable
+    reboot-strategy: off

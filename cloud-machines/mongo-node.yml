@@ -1,0 +1,36 @@
+instance:
+  name: mongo-node
+  type: r3.xlarge
+  imageid: ami-5d4d486d
+  region: us-west-2
+  defaultavailablezone: us-west-2a
+  keyname: aws-keyname
+  securitygroups: [sg-00000000]
+  subnetid: subnet-abcd0000
+  cloudconfig: cloud-configs/mongo-node.yaml
+  ebsoptimized: true
+
+volumes:
+  - name: mongo-data
+    type: io1
+    size: 200
+    iops: 1000
+    device: /dev/xvdk
+    mount: /mongo-data
+    filesystem: btrfs
+
+  - name: mongo-journal
+    type: io1
+    size: 25
+    iops: 250
+    device: /dev/xvdl
+    mount: /mongo-journal
+    filesystem: btrfs
+
+  - name: mongo-log
+    type: io1
+    size: 10
+    iops: 100
+    device: /dev/xvdm
+    mount: /mongo-log
+    filesystem: btrfs
