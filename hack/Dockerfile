@@ -18,13 +18,12 @@ ENV PATH /go/bin:/usr/local/go/bin:$PATH
 ENV GOPATH /go
 RUN cd /usr/local/go/src && ./make.bash --no-clean 2>&1
 
-WORKDIR /go/src/NeowayLabs/cloud-machine
+WORKDIR /go/src/github.com/NeowayLabs/cloud-machine
 
 ENV CGO_ENABLED 0
 
 # Upload docker source
-COPY . /go/src/NeowayLabs/cloud-machine
+COPY . /go/src/github.com/NeowayLabs/cloud-machine
 
 # Grab Go's cover tool for dead-simple code coverage testing
 RUN go get -d
-
