@@ -1,6 +1,8 @@
-NAME="neowaylabs/cloud-machine"
+WORKDIR="github.com/NeowayLabs/cloud-machine"
+
+IMAGENAME="neowaylabs/cloud-machine"
 REGISTRY="hub.docker.com"
-IMAGE=$(REGISTRY)/$(NAME):1.0.0
+IMAGE=$(REGISTRY)/$(IMAGENAME):1.0.0
 
 all: image
 	@echo "Create image: ${IMAGE}"
@@ -14,14 +16,14 @@ deploy: image
 	docker push $(IMAGE)
 
 build: build-env
-	docker run --rm -v `pwd`:/go/src/$(NAME) --privileged -i -t $(NAME) bash hack/make.sh
+	docker run --rm -v `pwd`:/go/src/$(WORKDIR) --privileged -i -t $(IMAGENAME) bash hack/make.sh
 
 build-env:
-	docker build -t $(NAME) -f ./hack/Dockerfile .
+	docker build -t $(IMAGENAME) -f ./hack/Dockerfile .
 
 check: build
-	docker run --rm -v `pwd`:/go/src/$(NAME) --privileged -i -t $(NAME) bash hack/check.sh
+	docker run --rm -v `pwd`:/go/src/$(WORKDIR) --privileged -i -t $(IMAGENAME) bash hack/check.sh
 
 shell: build
-	docker run --rm -v `pwd`:/go/src/$(NAME) --privileged -i -t $(NAME) bash
+	docker run --rm -v `pwd`:/go/src/$(WORKDIR) --privileged -i -t $(IMAGENAME) bash
 
