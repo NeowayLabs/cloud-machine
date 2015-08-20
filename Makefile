@@ -1,4 +1,4 @@
-NAME="NeowayLabs/cloud-machine"
+NAME="neowaylabs/cloud-machine"
 REGISTRY="hub.docker.com"
 IMAGE=$(REGISTRY)/$(NAME):1.0.0
 
