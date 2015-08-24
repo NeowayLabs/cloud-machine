@@ -102,9 +102,9 @@ instance:
   imageid: ami-5d4d486d
   region: us-west-2
   defaultavailablezone: us-west-2a
-  keyname: awsdev-simm-core-key
-  securitygroups: [sg-10020475, sg-10020476]
-  subnetid: subnet-eccd5889
+  keyname: aws-keyname
+  securitygroups: [sg-00000000,sg-00000001]
+  subnetid: subnet-abcd0000
   cloudconfig: cloud-config/mongo-node.yaml
   ebsoptimized: true
   shutdownbehavior: stop
@@ -158,7 +158,7 @@ Here we have an example of cluster-config
 clusters:
   - machine: cloud-machine/mongo-node.yml
     nodes: 3
-    
+
   - machine: cloud-machine/elasticsearch-node.yml
     nodes: 2
 ```
