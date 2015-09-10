@@ -12,7 +12,7 @@ The easier way to compile this project is getting
 #### Docker at Linux
 
 If you already have Docker installed in your Linux, you can simply type:
-```make```. Two files will be created in root directory of project: 
+```make```. Two files will be created in root directory of project:
 ```machine-up``` and ```cluster-up```
 
 #### Other way
@@ -67,7 +67,7 @@ this property all other properties will be ignored.
 * **region:** Region used to create the instance. *[Required]*
 * **defaultavailablezone:** The default available zone to create volumes. *[Optional]*
 * **keyname:** Keyname used to permit access to instance. *[Required]*
-* **securitygroups:** Array of security groups. *[Required]*
+* **securitygroups:** Array of security group Id. *[Required]*
 * **subnetid:** Subnet Id of instance. *[Required]*
 * **cloudconfig:** File that will be used to pass as userdata to instance. *[Optional]*
 * **ebsoptimized:** If instance should be EBS Optimized, default is false. *[Optional]*
