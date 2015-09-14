@@ -1,19 +1,18 @@
+version ?= latest
 WORKDIR="github.com/NeowayLabs/cloud-machine"
-
-IMAGENAME="neowaylabs/cloud-machine"
-REGISTRY="hub.docker.com"
-IMAGE=$(REGISTRY)/$(IMAGENAME):1.0.0
+IMAGENAME=neowaylabs/cloud-machine
+IMAGE=$(IMAGENAME):$(version)
 
 all: image
 	@echo "Create image: ${IMAGE}"
 
 install: deploy
 
+publish: image
+	docker push $(IMAGE)
+
 image: build
 	docker build -t $(IMAGE) .
-
-deploy: image
-	docker push $(IMAGE)
 
 build: build-env
 	docker run --rm -v `pwd`:/go/src/$(WORKDIR) --privileged -i -t $(IMAGENAME) bash hack/make.sh
