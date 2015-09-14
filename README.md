@@ -171,3 +171,15 @@ export AWS_ACCESS_KEY=<your access key>
 export AWS_SECRET_KEY=<your secret key>
 ./cluster-up ./cloud-machine/app-cluster.yml
 ```
+
+## Publishing the image
+
+If you have the permissions and are logged (using docker login) just run:
+
+    make publish
+
+And a latest image will be generated. If you want to generate a specific version just run:
+
+    make publish version=<version>
+
+Where **version** is the version that you are generating (should match with the tag, you created a tag... right ?)
