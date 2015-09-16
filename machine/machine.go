@@ -51,7 +51,7 @@ func Get(machine *Machine, auth aws.Auth) error {
 		myVolume := &machine.Volumes[key]
 
 		format := false
-		if myVolume.Id == "" {
+		if myVolume.Id == "" && myVolume.SnapshotId == "" {
 			format = true
 		}
 

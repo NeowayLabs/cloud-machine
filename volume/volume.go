@@ -31,6 +31,7 @@ type Volume struct {
 	Device        string
 	Mount         string
 	FileSystem    string
+	SnapshotId    string
 	ec2.Volume
 }
 
@@ -137,11 +138,19 @@ func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 func Create(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	options := ec2.CreateVolume{
 		VolumeType: volume.Type,
-		VolumeSize: volume.Size,
+		AvailZone:  volume.AvailableZone,
+	}
+
+	if volume.Size > 0 {
+		options.VolumeSize = volume.Size
 	}
 
 	if volume.AvailableZone == "" {
 		options.AvailZone = DefaultAvailableZone
+	}
+
+	if volume.SnapshotId != "" {
+		options.SnapshotId = volume.SnapshotId
 	}
 
 	if volume.Type == "io1" {
