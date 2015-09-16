@@ -87,10 +87,14 @@ this property all other properties will be ignored.
 * **device:** The device used of this volume. *[Required]*
 * **mount:** Where should mount the volume. *[Required]*
 * **filesystem:** File system used to mount the device. *[Required]*
+* **snapshotid:** When informed, the volume is created from an existing snapshot. In this case the volume is not formatted, obviously.
 
-**IMPORTANT:** If you have new volumes (without ID property) a new machine will
+
+**IMPORTANT:** If you have new volumes (without ID property or snapshotId) a new machine will
 be created only to format this volume, after format the machine will be
 automatically destroyed. Cost will be applied.
+
+**IMPORTANT:** If you want to create a volume from a snapshot and increase the size of the new volume, you need to run a resize2fs as [Aws Increase Volumes](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-expand-volume.html)
 
 Here we have an example of machine-config
 
