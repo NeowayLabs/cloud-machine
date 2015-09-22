@@ -159,6 +159,14 @@ Here we have an example of cluster-config
 
 ```
 # cloud-machine/app-cluster.yml
+default:
+  imageid: ami-5d4d486d
+  region: us-west-2
+  keyname: aws-keyname
+  securitygroups: [sg-00000000,sg-00000001]
+  subnetid: subnet-abcd0000
+  defaultavailablezone: us-west-2a
+
 clusters:
   - machine: cloud-machine/mongo-node.yml
     nodes: 3
