@@ -15,13 +15,14 @@ import (
 )
 
 const (
-	DefaultFormatInstanceImageId = "ami-c5162ef5"
+	DefaultFormatInstanceImageID = "ami-c5162ef5"
 	DefaultFormatInstanceType    = "t2.micro"
 )
 
 var output io.Writer = os.Stderr
 var logger = log.New(output, "", 0)
 
+// SetLogger ...
 func SetLogger(out io.Writer, prefix string, flag int) {
 	output = out
 	logger = log.New(out, prefix, flag)
@@ -29,11 +30,13 @@ func SetLogger(out io.Writer, prefix string, flag int) {
 	volume.SetLogger(out, prefix, flag)
 }
 
+// Machine ...
 type Machine struct {
 	Instance instance.Instance
 	Volumes  []volume.Volume
 }
 
+// Get ...
 func Get(machine *Machine, auth aws.Auth) error {
 	ec2Ref := ec2.New(auth, aws.Regions[machine.Instance.Region], aws.SignV4Factory(machine.Instance.Region, "ec2"))
 
@@ -47,11 +50,11 @@ func Get(machine *Machine, auth aws.Auth) error {
 
 	// get list of volumes to format
 	volumesToFormat := make([]volume.Volume, 0)
-	for key, _ := range machine.Volumes {
+	for key := range machine.Volumes {
 		myVolume := &machine.Volumes[key]
 
 		format := false
-		if myVolume.Id == "" && myVolume.SnapshotId == "" {
+		if myVolume.ID == "" && myVolume.SnapshotID == "" {
 			format = true
 		}
 
@@ -78,7 +81,7 @@ func Get(machine *Machine, auth aws.Auth) error {
 		return err
 	}
 
-	err = AttachVolumes(ec2Ref, machine.Instance.Id, machine.Volumes)
+	err = AttachVolumes(ec2Ref, machine.Instance.ID, machine.Volumes)
 	if err != nil {
 		return err
 	}
@@ -88,14 +91,15 @@ func Get(machine *Machine, auth aws.Auth) error {
 		return err
 	}
 
-	logger.Printf("The instance <%s> with IP Address <%s> is running with %d volume(s)!\n", machine.Instance.Id, machine.Instance.PrivateIPAddress, len(machine.Volumes))
+	logger.Printf("The instance Id <%s> with IP Address <%s> is running with %d volume(s)!\n", machine.Instance.ID, machine.Instance.PrivateIPAddress, len(machine.Volumes))
 
 	return nil
 }
 
-func AttachVolumes(ec2Ref *ec2.EC2, InstanceId string, volumes []volume.Volume) error {
+// AttachVolumes ...
+func AttachVolumes(ec2Ref *ec2.EC2, InstanceID string, volumes []volume.Volume) error {
 	for _, myVolume := range volumes {
-		_, err := ec2Ref.AttachVolume(myVolume.Id, InstanceId, myVolume.Device)
+		_, err := ec2Ref.AttachVolume(myVolume.ID, InstanceID, myVolume.Device)
 		if err != nil {
 			reqError := err.(*ec2.Error)
 			if reqError.Code != "VolumeInUse" {
@@ -107,6 +111,7 @@ func AttachVolumes(ec2Ref *ec2.EC2, InstanceId string, volumes []volume.Volume) 
 	return nil
 }
 
+// FormatVolumes ...
 func FormatVolumes(ec2Ref *ec2.EC2, machine Machine, volumes []volume.Volume) error {
 	err := os.Mkdir("cloud-config", 0755)
 	if os.IsPermission(err) == true {
@@ -130,11 +135,11 @@ func FormatVolumes(ec2Ref *ec2.EC2, machine Machine, volumes []volume.Volume) er
 	formatInstance := instance.Instance{
 		Name:             name,
 		CloudConfig:      cloudConfigName,
-		ImageId:          DefaultFormatInstanceImageId,
+		ImageID:          DefaultFormatInstanceImageID,
 		Type:             DefaultFormatInstanceType,
 		KeyName:          machine.Instance.KeyName,
 		SecurityGroups:   machine.Instance.SecurityGroups,
-		SubnetId:         machine.Instance.SubnetId,
+		SubnetID:         machine.Instance.SubnetID,
 		ShutdownBehavior: "terminate",
 	}
 
@@ -143,7 +148,7 @@ func FormatVolumes(ec2Ref *ec2.EC2, machine Machine, volumes []volume.Volume) er
 		return err
 	}
 
-	err = AttachVolumes(ec2Ref, formatInstance.Id, volumes)
+	err = AttachVolumes(ec2Ref, formatInstance.ID, volumes)
 	if err != nil {
 		return err
 	}
