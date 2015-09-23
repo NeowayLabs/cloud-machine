@@ -8,7 +8,6 @@ import (
 
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/cloud-machine/volume"
-	"gopkg.in/amz.v3/aws"
 	"gopkg.in/yaml.v2"
 )
 
@@ -106,7 +105,7 @@ func main() {
 		machines[key] = Cluster{Machine: myMachine, Nodes: myCluster.Nodes}
 	}
 
-	auth, err := aws.EnvAuth()
+	auth, err := AwsAuth()
 	if err != nil {
 		panic(err.Error())
 	}

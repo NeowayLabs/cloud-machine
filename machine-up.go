@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/NeowayLabs/cloud-machine/machine"
-	"gopkg.in/amz.v3/aws"
 	"gopkg.in/yaml.v2"
 )
 
@@ -31,7 +30,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	auth, err := aws.EnvAuth()
+	auth, err := AwsAuth()
 	if err != nil {
 		panic(err.Error())
 	}
