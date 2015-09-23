@@ -11,16 +11,19 @@ import (
 	"gopkg.in/amz.v3/ec2"
 )
 
+// DefaultAvailableZone ...
 const DefaultAvailableZone = "us-west-2a"
 
 var loggerOutput io.Writer = os.Stderr
 var logger = log.New(loggerOutput, "", 0)
 
+// SetLogger ...
 func SetLogger(out io.Writer, prefix string, flag int) {
 	loggerOutput = out
 	logger = log.New(out, prefix, flag)
 }
 
+// Volume ...
 type Volume struct {
 	ID            string
 	Name          string
@@ -53,9 +56,8 @@ func mergeVolumes(volume *Volume, volumeRef *ec2.Volume) {
 	}
 }
 
-/**
- * Valid values to state is: creating, available, in-use, deleting, deleted, error
- */
+// WaitUntilState valid values to state is: creating, available, in-use,
+// deleting, deleted, error
 func WaitUntilState(ec2Ref *ec2.EC2, volume *Volume, state string) error {
 	fmt.Fprintf(loggerOutput, "Volume status is <%s>, waiting for <%s>", volume.Status, state)
 
@@ -75,9 +77,7 @@ func WaitUntilState(ec2Ref *ec2.EC2, volume *Volume, state string) error {
 	}
 }
 
-/**
- * Get a volume, if Id was not passed a new volume will be created
- */
+// Get a volume, if Id was not passed a new volume will be created
 func Get(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	var volumeRef ec2.Volume
 	var err error
@@ -111,9 +111,7 @@ func Get(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	return volumeRef, nil
 }
 
-/**
- * Load a volume passing its Id
- */
+// Load a volume passing its Id
 func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	if volume.ID == "" {
 		return ec2.Volume{}, errors.New("To load a volume you need to pass its Id")
@@ -123,7 +121,7 @@ func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	if err != nil {
 		return ec2.Volume{}, err
 	} else if len(resp.Volumes) == 0 {
-		return ec2.Volume{}, errors.New(fmt.Sprintf("Any volume was found with volume Id <%s>", volume.ID))
+		return ec2.Volume{}, fmt.Errorf(fmt.Sprintf("Any volume was found with volume Id <%s>", volume.ID))
 	}
 
 	volumeRef := resp.Volumes[0]
@@ -132,9 +130,7 @@ func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	return volumeRef, nil
 }
 
-/**
- * Create new volume
- */
+// Create new volume
 func Create(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	options := ec2.CreateVolume{
 		VolumeType: volume.Type,
