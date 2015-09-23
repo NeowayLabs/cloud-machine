@@ -23,14 +23,14 @@ func SetLogger(out io.Writer, prefix string, flag int) {
 }
 
 type Instance struct {
-	Id                   string
+	ID                   string
 	Name                 string
 	Type                 string
-	ImageId              string
+	ImageID              string
 	Region               string
 	KeyName              string
 	SecurityGroups       []string
-	SubnetId             string
+	SubnetID             string
 	DefaultAvailableZone string
 	CloudConfig          string
 	EBSOptimized         bool
@@ -44,10 +44,10 @@ func mergeInstances(instance *Instance, instanceRef *ec2.Instance) {
 	instance.Instance = *instanceRef
 	// Instance struct has some fields that is present in ec2.Instance
 	// We should rewrite this fields
-	instance.Id = instanceRef.InstanceId
+	instance.ID = instanceRef.InstanceId
 	instance.Type = instanceRef.InstanceType
-	instance.ImageId = instanceRef.ImageId
-	instance.SubnetId = instanceRef.SubnetId
+	instance.ImageID = instanceRef.ImageId
+	instance.SubnetID = instanceRef.SubnetId
 	instance.KeyName = instanceRef.KeyName
 	instance.DefaultAvailableZone = instanceRef.AvailZone
 	instance.EBSOptimized = instanceRef.EBSOptimized
@@ -92,12 +92,12 @@ func WaitUntilState(ec2Ref *ec2.EC2, instance *Instance, state string) error {
 func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	var instanceRef ec2.Instance
 	var err error
-	if instance.Id == "" {
+	if instance.ID == "" {
 		logger.Printf("Creating new instance...\n")
 		instanceRef, err = Create(ec2Ref, instance)
 		logger.Printf("--------- NEW INSTANCE ---------\n")
 	} else {
-		logger.Printf("Loading instance id <%s>...\n", instance.Id)
+		logger.Printf("Loading instance Id <%s>...\n", instance.ID)
 		instanceRef, err = Load(ec2Ref, instance)
 		logger.Printf("--------- LOADING INSTANCE ---------\n")
 	}
@@ -106,15 +106,15 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 		return instanceRef, err
 	}
 
-	logger.Printf("    Id: %s\n", instance.Id)
+	logger.Printf("    Id: %s\n", instance.ID)
 	logger.Printf("    Name: %s\n", instance.Name)
 	logger.Printf("    Type: %s\n", instance.Type)
-	logger.Printf("    Image Id: %s\n", instance.ImageId)
+	logger.Printf("    Image Id: %s\n", instance.ImageID)
 	logger.Printf("    Available Zone: %s\n", instance.DefaultAvailableZone)
 	logger.Printf("    Key Name: %s\n", instance.KeyName)
 	logger.Printf("    Security Groups: %+v\n", instance.SecurityGroups)
 	logger.Printf("    PlacementGroupName: %+v\n", instance.PlacementGroupName)
-	logger.Printf("    Subnet Id: %s\n", instance.SubnetId)
+	logger.Printf("    Subnet Id: %s\n", instance.SubnetID)
 	logger.Printf("    EBS Optimized: %t\n", instance.EBSOptimized)
 	logger.Println("----------------------------------\n")
 
@@ -125,15 +125,15 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
  * Load a instance passing its Id
  */
 func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
-	if instance.Id == "" {
+	if instance.ID == "" {
 		return ec2.Instance{}, errors.New("To load a instance you need to pass its Id")
 	}
 
-	resp, err := ec2Ref.Instances([]string{instance.Id}, nil)
+	resp, err := ec2Ref.Instances([]string{instance.ID}, nil)
 	if err != nil {
 		return ec2.Instance{}, err
 	} else if len(resp.Reservations) == 0 || len(resp.Reservations[0].Instances) == 0 {
-		return ec2.Instance{}, errors.New(fmt.Sprintf("Any instance was found with instance Id <%s>", instance.Id))
+		return ec2.Instance{}, errors.New(fmt.Sprintf("Any instance was found with instance Id <%s>", instance.ID))
 	}
 
 	instanceRef := resp.Reservations[0].Instances[0]
@@ -147,11 +147,11 @@ func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
  */
 func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	options := ec2.RunInstances{
-		ImageId:               instance.ImageId,
+		ImageId:               instance.ImageID,
 		InstanceType:          instance.Type,
 		KeyName:               instance.KeyName,
 		SecurityGroups:        make([]ec2.SecurityGroup, len(instance.SecurityGroups)),
-		SubnetId:              instance.SubnetId,
+		SubnetId:              instance.SubnetID,
 		EBSOptimized:          instance.EBSOptimized,
 		DisableAPITermination: !instance.EnableAPITermination,
 	}
@@ -208,17 +208,17 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 }
 
 func Terminate(ec2Ref *ec2.EC2, instance Instance) error {
-	logger.Println("Terminating instance", instance.Id)
-	_, err := ec2Ref.TerminateInstances([]string{instance.Id})
+	logger.Println("Terminating instance", instance.ID)
+	_, err := ec2Ref.TerminateInstances([]string{instance.ID})
 	if err == nil {
-		logger.Printf("Instance <%s> was destroyed!\n", instance.Id)
+		logger.Printf("Instance <%s> was destroyed!\n", instance.ID)
 	}
 
 	return err
 }
 
 func Reboot(ec2Ref *ec2.EC2, instance Instance) error {
-	logger.Println("Rebooting instance", instance.Id)
+	logger.Println("Rebooting instance", instance.ID)
 	_, err := ec2Ref.RebootInstances(instance.InstanceId)
 	return err
 }
