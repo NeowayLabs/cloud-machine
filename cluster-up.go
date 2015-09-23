@@ -29,11 +29,11 @@ type (
 
 	// Default ...
 	Default struct {
-		ImageId              string
+		ImageID              string
 		Region               string
 		KeyName              string
 		SecurityGroups       []string
-		SubnetId             string
+		SubnetID             string
 		DefaultAvailableZone string
 	}
 )
@@ -60,7 +60,7 @@ func main() {
 
 	// First verify if I can open all machine files
 	machines := make([]Cluster, len(clusters.Clusters))
-	for key, _ := range clusters.Clusters {
+	for key := range clusters.Clusters {
 		myCluster := &clusters.Clusters[key]
 
 		machineContent, err := ioutil.ReadFile(myCluster.Machine)
@@ -83,8 +83,8 @@ func main() {
 		}
 
 		// Set default values of cluster to machine
-		if myMachine.Instance.ImageId == "" {
-			myMachine.Instance.ImageId = clusters.Default.ImageId
+		if myMachine.Instance.ImageID == "" {
+			myMachine.Instance.ImageID = clusters.Default.ImageID
 		}
 		if myMachine.Instance.Region == "" {
 			myMachine.Instance.Region = clusters.Default.Region
@@ -95,8 +95,8 @@ func main() {
 		if len(myMachine.Instance.SecurityGroups) == 0 {
 			myMachine.Instance.SecurityGroups = clusters.Default.SecurityGroups
 		}
-		if myMachine.Instance.SubnetId == "" {
-			myMachine.Instance.SubnetId = clusters.Default.SubnetId
+		if myMachine.Instance.SubnetID == "" {
+			myMachine.Instance.SubnetID = clusters.Default.SubnetID
 		}
 		if myMachine.Instance.DefaultAvailableZone == "" {
 			myMachine.Instance.DefaultAvailableZone = clusters.Default.DefaultAvailableZone
@@ -123,7 +123,7 @@ func main() {
 			myMachine.Instance.Name += fmt.Sprintf("-%d", i)
 
 			// append machine number to name of volume
-			for key, _ := range myCluster.Machine.Volumes {
+			for key := range myCluster.Machine.Volumes {
 				referenceVolume := &myCluster.Machine.Volumes[key]
 
 				myVolume := *referenceVolume
@@ -136,7 +136,7 @@ func main() {
 			if err != nil {
 				panic(err.Error())
 			}
-			fmt.Printf("Machine id <%s>, ip address <%s>\n", myMachine.Instance.Id, myMachine.Instance.PrivateIPAddress)
+			fmt.Printf("Machine Id <%s>, IP Address <%s>\n", myMachine.Instance.ID, myMachine.Instance.PrivateIPAddress)
 			if i < myCluster.Nodes {
 				fmt.Println("----------------------------------")
 			}
