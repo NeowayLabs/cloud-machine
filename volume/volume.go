@@ -22,7 +22,7 @@ func SetLogger(out io.Writer, prefix string, flag int) {
 }
 
 type Volume struct {
-	Id            string
+	ID            string
 	Name          string
 	Type          string
 	Size          int
@@ -31,7 +31,7 @@ type Volume struct {
 	Device        string
 	Mount         string
 	FileSystem    string
-	SnapshotId    string
+	SnapshotID    string
 	ec2.Volume
 }
 
@@ -39,7 +39,7 @@ func mergeVolumes(volume *Volume, volumeRef *ec2.Volume) {
 	volume.Volume = *volumeRef
 	// Volume struct has some fields that is present in ec2.Volume
 	// We should rewrite this fields
-	volume.Id = volumeRef.Id
+	volume.ID = volumeRef.Id
 	volume.Size = volumeRef.Size
 	volume.IOPS = volumeRef.IOPS
 	volume.AvailableZone = volumeRef.AvailZone
@@ -81,12 +81,12 @@ func WaitUntilState(ec2Ref *ec2.EC2, volume *Volume, state string) error {
 func Get(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	var volumeRef ec2.Volume
 	var err error
-	if volume.Id == "" {
+	if volume.ID == "" {
 		logger.Printf("Creating new volume...\n")
 		volumeRef, err = Create(ec2Ref, volume)
 		logger.Printf("--------- NEW VOLUME ---------\n")
 	} else {
-		logger.Printf("Loading volume id <%s>...\n", volume.Id)
+		logger.Printf("Loading volume Id <%s>...\n", volume.ID)
 		volumeRef, err = Load(ec2Ref, volume)
 		logger.Printf("--------- LOADING VOLUME ---------\n")
 	}
@@ -95,7 +95,7 @@ func Get(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 		return volumeRef, err
 	}
 
-	logger.Printf("    Id: %s\n", volume.Id)
+	logger.Printf("    Id: %s\n", volume.ID)
 	logger.Printf("    Name: %s\n", volume.Name)
 	logger.Printf("    Type: %s\n", volume.Type)
 	logger.Printf("    Size: %d\n", volume.Size)
@@ -115,15 +115,15 @@ func Get(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
  * Load a volume passing its Id
  */
 func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
-	if volume.Id == "" {
+	if volume.ID == "" {
 		return ec2.Volume{}, errors.New("To load a volume you need to pass its Id")
 	}
 
-	resp, err := ec2Ref.Volumes([]string{volume.Id}, nil)
+	resp, err := ec2Ref.Volumes([]string{volume.ID}, nil)
 	if err != nil {
 		return ec2.Volume{}, err
 	} else if len(resp.Volumes) == 0 {
-		return ec2.Volume{}, errors.New(fmt.Sprintf("Any volume was found with volume Id <%s>", volume.Id))
+		return ec2.Volume{}, errors.New(fmt.Sprintf("Any volume was found with volume Id <%s>", volume.ID))
 	}
 
 	volumeRef := resp.Volumes[0]
@@ -149,8 +149,8 @@ func Create(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 		options.AvailZone = DefaultAvailableZone
 	}
 
-	if volume.SnapshotId != "" {
-		options.SnapshotId = volume.SnapshotId
+	if volume.SnapshotID != "" {
+		options.SnapshotId = volume.SnapshotID
 	}
 
 	if volume.Type == "io1" {
