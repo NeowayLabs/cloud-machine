@@ -8,6 +8,7 @@ import (
 
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/cloud-machine/volume"
+	"github.com/NeowayLabs/logger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -43,19 +44,18 @@ func main() {
 
 	clusterFile := flag.Arg(0)
 	if clusterFile == "" {
-		fmt.Printf("You need to pass the cluster file, type: %s <cluster-file.yml>\n", os.Args[0])
-		return
+		logger.Fatal("You need to pass the cluster file, type: %s <cluster-file.yml>\n", os.Args[0])
 	}
 
 	clusterContent, err := ioutil.ReadFile(clusterFile)
 	if err != nil {
-		panic(err.Error())
+		logger.Fatal("Error open cluster file: %s", err.Error())
 	}
 
 	var clusters Clusters
 	err = yaml.Unmarshal(clusterContent, &clusters)
 	if err != nil {
-		panic(err.Error())
+		logger.Fatal("Error reading cluster file: %s", err.Error())
 	}
 
 	// First verify if I can open all machine files
@@ -65,20 +65,20 @@ func main() {
 
 		machineContent, err := ioutil.ReadFile(myCluster.Machine)
 		if err != nil {
-			panic(err.Error())
+			logger.Fatal("Error open machine file: %s", err.Error())
 		}
 
 		var myMachine machine.Machine
 		err = yaml.Unmarshal(machineContent, &myMachine)
 		if err != nil {
-			panic(err.Error())
+			logger.Fatal("Error reading machine file: %s", err.Error())
 		}
 
 		// Verify if cloud-config file exists
 		if myMachine.Instance.CloudConfig != "" {
 			_, err := os.Stat(myMachine.Instance.CloudConfig)
 			if err != nil {
-				panic(err.Error())
+				logger.Fatal("Error reading cloud-config: %s", err.Error())
 			}
 		}
 
@@ -107,7 +107,7 @@ func main() {
 
 	auth, err := AwsAuth()
 	if err != nil {
-		panic(err.Error())
+		logger.Fatal("Error reading aws credentials: %s", err.Error())
 	}
 
 	machine.SetLogger(ioutil.Discard, "", 0)
@@ -134,7 +134,7 @@ func main() {
 			fmt.Printf("Running machine: %s\n", myMachine.Instance.Name)
 			err = machine.Get(&myMachine, auth)
 			if err != nil {
-				panic(err.Error())
+				logger.Fatal("Error getting machine: %s", err.Error())
 			}
 			fmt.Printf("Machine Id <%s>, IP Address <%s>\n", myMachine.Instance.ID, myMachine.Instance.PrivateIPAddress)
 			if i < myCluster.Nodes {

@@ -121,7 +121,7 @@ func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	if err != nil {
 		return ec2.Volume{}, err
 	} else if len(resp.Volumes) == 0 {
-		return ec2.Volume{}, fmt.Errorf(fmt.Sprintf("Any volume was found with volume Id <%s>", volume.ID))
+		return ec2.Volume{}, fmt.Errorf("Any volume was found with volume Id <%s>", volume.ID)
 	}
 
 	volumeRef := resp.Volumes[0]

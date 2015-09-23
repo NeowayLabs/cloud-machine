@@ -129,7 +129,7 @@ func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	if err != nil {
 		return ec2.Instance{}, err
 	} else if len(resp.Reservations) == 0 || len(resp.Reservations[0].Instances) == 0 {
-		return ec2.Instance{}, fmt.Errorf(fmt.Sprintf("Any instance was found with instance Id <%s>", instance.ID))
+		return ec2.Instance{}, fmt.Errorf("Any instance was found with instance Id <%s>", instance.ID)
 	}
 
 	instanceRef := resp.Reservations[0].Instances[0]
