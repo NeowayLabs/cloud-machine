@@ -17,11 +17,13 @@ import (
 var loggerOutput io.Writer = os.Stderr
 var logger = log.New(loggerOutput, "", 0)
 
+// SetLogger ...
 func SetLogger(out io.Writer, prefix string, flag int) {
 	loggerOutput = out
 	logger = log.New(out, prefix, flag)
 }
 
+// Instance ...
 type Instance struct {
 	ID                   string
 	Name                 string
@@ -65,9 +67,7 @@ func mergeInstances(instance *Instance, instanceRef *ec2.Instance) {
 	}
 }
 
-/**
- * Valid values to state is: pending, running, shutting-down, terminated, stopping, stopped
- */
+// WaitUntilState valid values to state is: pending, running, shutting-down, terminated, stopping, stopped
 func WaitUntilState(ec2Ref *ec2.EC2, instance *Instance, state string) error {
 	fmt.Fprintf(loggerOutput, "Instance state is <%s>, waiting for <%s>", instance.State.Name, state)
 	for {
@@ -86,9 +86,7 @@ func WaitUntilState(ec2Ref *ec2.EC2, instance *Instance, state string) error {
 	}
 }
 
-/**
- * Get a instance, if Id was not passed a new instance will be created
- */
+// Get a instance, if Id was not passed a new instance will be created
 func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	var instanceRef ec2.Instance
 	var err error
@@ -121,9 +119,7 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	return instanceRef, nil
 }
 
-/**
- * Load a instance passing its Id
- */
+// Load a instance passing its Id
 func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	if instance.ID == "" {
 		return ec2.Instance{}, errors.New("To load a instance you need to pass its Id")
@@ -133,7 +129,7 @@ func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	if err != nil {
 		return ec2.Instance{}, err
 	} else if len(resp.Reservations) == 0 || len(resp.Reservations[0].Instances) == 0 {
-		return ec2.Instance{}, errors.New(fmt.Sprintf("Any instance was found with instance Id <%s>", instance.ID))
+		return ec2.Instance{}, fmt.Errorf(fmt.Sprintf("Any instance was found with instance Id <%s>", instance.ID))
 	}
 
 	instanceRef := resp.Reservations[0].Instances[0]
@@ -142,9 +138,7 @@ func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	return instanceRef, nil
 }
 
-/**
- * Create new instance
- */
+// Create new instance
 func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	options := ec2.RunInstances{
 		ImageId:               instance.ImageID,
@@ -207,6 +201,7 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	return instanceRef, nil
 }
 
+// Terminate ...
 func Terminate(ec2Ref *ec2.EC2, instance Instance) error {
 	logger.Println("Terminating instance", instance.ID)
 	_, err := ec2Ref.TerminateInstances([]string{instance.ID})
@@ -217,6 +212,7 @@ func Terminate(ec2Ref *ec2.EC2, instance Instance) error {
 	return err
 }
 
+// Reboot ...
 func Reboot(ec2Ref *ec2.EC2, instance Instance) error {
 	logger.Println("Rebooting instance", instance.ID)
 	_, err := ec2Ref.RebootInstances(instance.InstanceId)
