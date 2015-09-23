@@ -13,6 +13,7 @@ import (
 )
 
 type (
+	// Clusters ...
 	Clusters struct {
 		Default  Default
 		Clusters []struct {
@@ -21,11 +22,13 @@ type (
 		}
 	}
 
+	// Cluster ...
 	Cluster struct {
 		Machine machine.Machine
 		Nodes   int
 	}
 
+	// Default ...
 	Default struct {
 		ImageId              string
 		Region               string
