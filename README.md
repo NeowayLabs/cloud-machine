@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/NeowayLabs/cloud-machine.svg?branch=master)](https://travis-ci.org/NeowayLabs/cloud-machine)
+
 # Cloud Machine
 
 This is a Go Project that should be used to create a cloud environment. The app

@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - 1.4
+  - tip
+install:
+  - go get -d -v ./...
+  - go build -v ./...
+notifications:
+  email:
+    - guilherme.santos@neoway.com.br
+    - luciano.faustino@neoway.com.br
