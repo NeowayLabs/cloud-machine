@@ -34,8 +34,8 @@ we need to pass ```-d``` to ```go get```
 export GOPATH=~/go # change to your go workspace
 go get -d github.com/NeowayLabs/cloud-machine
 cd $GOPATH/src/github.com/NeowayLabs/cloud-machine
-go build machine-up.go
-go build cluster-up.go
+go build machine-up.go auth.go
+go build cluster-up.go auth.go
 ```
 
 ## How use?
