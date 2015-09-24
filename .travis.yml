@@ -5,7 +5,8 @@ go:
   - tip
 install:
   - go get -d -v ./...
-  - go build -v ./...
+  - go build machine-up.go auth.go
+  - go build cluster-up.go auth.go
 notifications:
   email:
     - guilherme.santos@neoway.com.br
