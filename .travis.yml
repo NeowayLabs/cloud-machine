@@ -3,10 +3,6 @@ language: go
 go:
   - 1.4
   - tip
-install:
-  - go get -d -v ./...
-  - go build -v machine-up.go auth.go
-  - go build -v cluster-up.go auth.go
 notifications:
   email:
     - guilherme.santos@neoway.com.br

@@ -3,8 +3,13 @@ WORKDIR="github.com/NeowayLabs/cloud-machine"
 IMAGENAME=neowaylabs/cloud-machine
 IMAGE=$(IMAGENAME):$(version)
 
-all: image
-	@echo "Create image: ${IMAGE}"
+all: gobuild
+	@echo "Create: machine-up & cluster-up"
+
+gobuild:
+	go get -d -v ./...
+	go build -v machine-up.go auth.go
+	go build -v cluster-up.go auth.go
 
 install: deploy
 
