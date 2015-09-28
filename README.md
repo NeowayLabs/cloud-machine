@@ -75,6 +75,7 @@ this property all other properties will be ignored.
 * **ebsoptimized:** If instance should be EBS Optimized, default is false. *[Optional]*
 * **shutdownbehavior:** When you shutdown the machine will terminate or stop, default is stop. *[Optional]*
 * **enableapitermination:** If you authorize terminate this instance by aws console, cli, etc, default is false. *[Optional]*
+* **tags:** You can pass a list of key=values to add as tags to your instance. *[Optional]*
 
 To each volume you can use follow properties:
 
@@ -90,6 +91,7 @@ this property all other properties will be ignored.
 * **mount:** Where should mount the volume. *[Required]*
 * **filesystem:** File system used to mount the device. *[Required]*
 * **snapshotid:** When informed, the volume is created from an existing snapshot. In this case the volume is not formatted, obviously.
+* **tags:** You can pass a list of key=values to add as tags to your volume. *[Optional]*
 
 
 **IMPORTANT:** If you have new volumes (without ID property or snapshotId) a new machine will
@@ -115,6 +117,10 @@ instance:
   ebsoptimized: true
   shutdownbehavior: stop
   enableapitermination: false
+  tags:
+    - key1: value1
+    - key2: value2
+    - key3: value3
 
 volumes:
   - name: mongo-data
@@ -125,6 +131,10 @@ volumes:
     device: /dev/xvdk
     mount: /data
     filesystem: ext4
+    tags:
+    - key1: value1
+    - key2: value2
+    - key3: value3
 
   - name: mongo-journal
     #id: vol-123456
@@ -157,6 +167,10 @@ In cluster-config you can pass follow properties:
 * **machine:** The file used to describe machine ([see above](#machine-up)). *[Required]*
 * **nodes:** How many machines should be create. *[Required]*
 
+Sometimes you need use some default value to all your instances, for that leave theses fields empty inside in your
+*machine spec*, and fill inside of default in your *cloud spec*. This is very helpful when you need update you image id
+or if you want create your infra in another region for example, in this case you only need update in one file.
+
 Here we have an example of cluster-config
 
 ```
@@ -168,6 +182,10 @@ default:
   securitygroups: [sg-00000000,sg-00000001]
   subnetid: subnet-abcd0000
   defaultavailablezone: us-west-2a
+  tags:
+    - key1: value1
+    - key2: value2
+    - key3: value3
 
 clusters:
   - machine: cloud-machine/mongo-node.yml
