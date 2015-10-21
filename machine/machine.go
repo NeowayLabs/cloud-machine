@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	DefaultFormatInstanceImageID = "ami-c5162ef5"
+	DefaultFormatInstanceImageID = "ami-ed8b90dd"
 	DefaultFormatInstanceType    = "t2.micro"
 )
 
