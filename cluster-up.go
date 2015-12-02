@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/NeowayLabs/cloud-machine/instance"
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/cloud-machine/volume"
 	"github.com/NeowayLabs/logger"
+	"gopkg.in/amz.v3/ec2"
 	"gopkg.in/yaml.v2"
 )
 
@@ -38,7 +38,7 @@ type (
 		SecurityGroups       []string
 		SubnetID             string
 		DefaultAvailableZone string
-		Tags                 []instance.Tag
+		Tags                 []ec2.Tag
 	}
 )
 
