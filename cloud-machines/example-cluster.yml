@@ -5,14 +5,13 @@ default:
   keyname: aws-keyname
   securitygroups: [sg-00000000]
   subnetid: subnet-abcd0000
-
-tags:
-  - team: core
-  - env: staging
+  tags:
+    - { key: my-cluster-tag-1, value: value1 }
+    - { key: my-cluster-tag-2, value: value2 }
 
 clusters:
-  - machine: ./cloud-machines/mongo-node.yml
+  - machine: cloud-machines/mongo-node.yml
     nodes: 3
 
-  - machine: ./cloud-machines/elasticsearch-node.yml
+  - machine: cloud-machines/elasticsearch-node.yml
     nodes: 3

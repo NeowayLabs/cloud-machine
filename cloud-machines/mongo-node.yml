@@ -7,7 +7,7 @@ instance:
   keyname: aws-keyname
   securitygroups: [sg-00000000]
   subnetid: subnet-abcd0000
-  cloudconfig: cloud-configs/mongo-node.yaml
+  cloudconfig: cloud-configs/mongo-node.yml
   ebsoptimized: true
 
 volumes:
