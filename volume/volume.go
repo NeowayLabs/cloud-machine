@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/NeowayLabs/cloud-machine/instance"
+
 	"gopkg.in/amz.v3/ec2"
 )
 
@@ -35,6 +37,7 @@ type Volume struct {
 	Mount         string
 	FileSystem    string
 	SnapshotID    string
+	Tags          []instance.Tag
 	ec2.Volume
 }
 

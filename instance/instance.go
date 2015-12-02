@@ -23,6 +23,10 @@ func SetLogger(out io.Writer, prefix string, flag int) {
 	logger = log.New(out, prefix, flag)
 }
 
+type Tag struct {
+	Key, Value string
+}
+
 // Instance ...
 type Instance struct {
 	ID                   string
@@ -39,6 +43,7 @@ type Instance struct {
 	ShutdownBehavior     string
 	EnableAPITermination bool
 	PlacementGroupName   string
+	Tags                 []Tag
 	ec2.Instance
 }
 

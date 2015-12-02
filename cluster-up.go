@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
+	"github.com/NeowayLabs/cloud-machine/instance"
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/cloud-machine/volume"
 	"github.com/NeowayLabs/logger"
@@ -36,6 +38,7 @@ type (
 		SecurityGroups       []string
 		SubnetID             string
 		DefaultAvailableZone string
+		Tags                 []instance.Tag
 	}
 )
 
@@ -100,6 +103,33 @@ func main() {
 		}
 		if myMachine.Instance.DefaultAvailableZone == "" {
 			myMachine.Instance.DefaultAvailableZone = clusters.Default.DefaultAvailableZone
+		}
+
+		for _, tag := range clusters.Default.Tags {
+			addTag := true
+			for _, instanceTag := range myMachine.Instance.Tags {
+				if strings.EqualFold(instanceTag.Key, tag.Key) {
+					addTag = false
+				}
+			}
+
+			if addTag {
+				myMachine.Instance.Tags = append(myMachine.Instance.Tags, tag)
+			}
+
+			addTag = true
+			for k, volume := range myMachine.Volumes {
+				for _, volumeTag := range volume.Tags {
+					if strings.EqualFold(volumeTag.Key, tag.Key) {
+						addTag = false
+					}
+
+				}
+
+				if addTag {
+					myMachine.Volumes[k].Tags = append(myMachine.Volumes[k].Tags, tag)
+				}
+			}
 		}
 
 		machines[key] = Cluster{Machine: myMachine, Nodes: myCluster.Nodes}
