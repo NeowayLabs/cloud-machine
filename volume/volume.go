@@ -8,8 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/NeowayLabs/cloud-machine/instance"
-
 	"gopkg.in/amz.v3/ec2"
 )
 
@@ -37,7 +35,7 @@ type Volume struct {
 	Mount         string
 	FileSystem    string
 	SnapshotID    string
-	Tags          []instance.Tag
+	Tags          []ec2.Tag
 	ec2.Volume
 }
 
@@ -51,10 +49,12 @@ func mergeVolumes(volume *Volume, volumeRef *ec2.Volume) {
 	volume.AvailableZone = volumeRef.AvailZone
 	volume.Type = volumeRef.VolumeType
 
+	volume.Tags = make([]ec2.Tag, 0)
 	for _, tag := range volumeRef.Tags {
 		if tag.Key == "Name" {
 			volume.Name = tag.Value
-			break
+		} else {
+			volume.Tags = append(volume.Tags, tag)
 		}
 	}
 }
@@ -162,7 +162,8 @@ func Create(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 	}
 
 	volumeRef := resp.Volume
-	_, err = ec2Ref.CreateTags([]string{volumeRef.Id}, []ec2.Tag{{"Name", volume.Name}})
+	tags := append(volume.Tags, ec2.Tag{"Name", volume.Name})
+	_, err = ec2Ref.CreateTags([]string{volumeRef.Id}, tags)
 	if err != nil {
 		return ec2.Volume{}, err
 	}

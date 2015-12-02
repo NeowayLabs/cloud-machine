@@ -23,10 +23,6 @@ func SetLogger(out io.Writer, prefix string, flag int) {
 	logger = log.New(out, prefix, flag)
 }
 
-type Tag struct {
-	Key, Value string
-}
-
 // Instance ...
 type Instance struct {
 	ID                   string
@@ -43,7 +39,7 @@ type Instance struct {
 	ShutdownBehavior     string
 	EnableAPITermination bool
 	PlacementGroupName   string
-	Tags                 []Tag
+	Tags                 []ec2.Tag
 	ec2.Instance
 }
 
@@ -64,10 +60,12 @@ func mergeInstances(instance *Instance, instanceRef *ec2.Instance) {
 		instance.SecurityGroups[i] = securityGroup.Id
 	}
 
+	instance.Tags = make([]ec2.Tag, 0)
 	for _, tag := range instanceRef.Tags {
 		if tag.Key == "Name" {
 			instance.Name = tag.Value
-			break
+		} else {
+			instance.Tags = append(instance.Tags, tag)
 		}
 	}
 }
@@ -191,7 +189,8 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	}
 
 	instanceRef := resp.Instances[0]
-	_, err = ec2Ref.CreateTags([]string{instanceRef.InstanceId}, []ec2.Tag{{"Name", instance.Name}})
+	tags := append(instance.Tags, ec2.Tag{"Name", instance.Name})
+	_, err = ec2Ref.CreateTags([]string{instanceRef.InstanceId}, tags)
 	if err != nil {
 		return ec2.Instance{}, err
 	}
