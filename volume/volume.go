@@ -11,9 +11,6 @@ import (
 	"gopkg.in/amz.v3/ec2"
 )
 
-// DefaultAvailableZone ...
-const DefaultAvailableZone = "us-west-2a"
-
 var loggerOutput io.Writer = os.Stderr
 var logger = log.New(loggerOutput, "", 0)
 
@@ -142,10 +139,6 @@ func Create(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 
 	if volume.Size > 0 {
 		options.VolumeSize = volume.Size
-	}
-
-	if volume.AvailableZone == "" {
-		options.AvailZone = DefaultAvailableZone
 	}
 
 	if volume.SnapshotID != "" {
