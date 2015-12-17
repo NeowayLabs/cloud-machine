@@ -66,6 +66,8 @@ func Get(machine *Machine, auth aws.Auth) error {
 		if format == true {
 			volumesToFormat = append(volumesToFormat, *myVolume)
 		}
+
+		myVolume.AvailableZone = machine.Instance.AvailableZone
 	}
 
 	// Create a machine to format theses volumes
