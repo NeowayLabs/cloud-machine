@@ -140,6 +140,7 @@ func FormatVolumes(ec2Ref *ec2.EC2, machine Machine, volumes []volume.Volume) er
 		KeyName:          machine.Instance.KeyName,
 		SecurityGroups:   machine.Instance.SecurityGroups,
 		SubnetID:         machine.Instance.SubnetID,
+		AvailableZone:    machine.Instance.AvailableZone,
 		ShutdownBehavior: "terminate",
 	}
 
