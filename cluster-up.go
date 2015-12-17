@@ -102,7 +102,12 @@ func main() {
 			myMachine.Instance.SubnetID = clusters.Default.SubnetID
 		}
 		if myMachine.Instance.DefaultAvailableZone == "" {
-			myMachine.Instance.DefaultAvailableZone = clusters.Default.DefaultAvailableZone
+			myMachine.Instance.AvailableZone = clusters.Default.DefaultAvailableZone
+		} else {
+			myMachine.Instance.AvailableZone = myMachine.Instance.DefaultAvailableZone
+		}
+		if myMachine.Instance.AvailableZone == "" {
+			logger.Fatal("Cannot create machine without set 'defaultavailablezone' in cluster file or 'availablezone' in machine file, instance section")
 		}
 
 		for _, tag := range clusters.Default.Tags {
