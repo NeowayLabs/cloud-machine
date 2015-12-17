@@ -33,7 +33,8 @@ type Instance struct {
 	KeyName              string
 	SecurityGroups       []string
 	SubnetID             string
-	DefaultAvailableZone string
+	DefaultAvailableZone string // backward compatibility, use availablezone instead
+	AvailableZone        string
 	CloudConfig          string
 	EBSOptimized         bool
 	ShutdownBehavior     string
@@ -52,7 +53,7 @@ func mergeInstances(instance *Instance, instanceRef *ec2.Instance) {
 	instance.ImageID = instanceRef.ImageId
 	instance.SubnetID = instanceRef.SubnetId
 	instance.KeyName = instanceRef.KeyName
-	instance.DefaultAvailableZone = instanceRef.AvailZone
+	instance.AvailableZone = instanceRef.AvailZone
 	instance.EBSOptimized = instanceRef.EBSOptimized
 	instance.SecurityGroups = make([]string, len(instanceRef.SecurityGroups))
 
@@ -111,7 +112,7 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	logger.Printf("    Name: %s\n", instance.Name)
 	logger.Printf("    Type: %s\n", instance.Type)
 	logger.Printf("    Image Id: %s\n", instance.ImageID)
-	logger.Printf("    Available Zone: %s\n", instance.DefaultAvailableZone)
+	logger.Printf("    Available Zone: %s\n", instance.AvailableZone)
 	logger.Printf("    Key Name: %s\n", instance.KeyName)
 	logger.Printf("    Security Groups: %+v\n", instance.SecurityGroups)
 	logger.Printf("    PlacementGroupName: %+v\n", instance.PlacementGroupName)
@@ -151,6 +152,7 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 		SubnetId:              instance.SubnetID,
 		EBSOptimized:          instance.EBSOptimized,
 		DisableAPITermination: !instance.EnableAPITermination,
+		AvailZone:             instance.AvailableZone,
 	}
 
 	if instance.CloudConfig != "" {
