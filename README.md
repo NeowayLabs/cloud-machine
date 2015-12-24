@@ -77,21 +77,22 @@ this property all other properties will be ignored.
 * **enableapitermination:** If you authorize terminate this instance by aws console, cli, etc, default is false. *[Optional]*
 * **tags:** You can pass a list of key=values to add as tags to your instance. *[Optional]*
 
-To each volume you can use follow properties:
+Volume obligatory parameters:
 
-* **id:** The id to load a already created instance. *[Optional]*. If you pass
-this property all other properties will be ignored.
-* **name:** It will be create a tag with Name key. *[Required]*
-* **type:** The type of volume to create, can be standard, io1 and gp2. *[Required]*
-* **size:** The size of volume to created. *[Required]*
-* **iops:** The IOPS used to create volume, *only to io1 type* *[Optional]*
-* **availablezone:** Where create the volume, this property overwrite
-*defaultavailablezone* of instance. *[Optional]*
-* **device:** The device used of this volume. *[Required]*
-* **mount:** Where should mount the volume. *[Required]*
-* **filesystem:** File system used to mount the device. *[Required]*
+* **name:** It will be create a tag with Name key.
+* **type:** The type of volume to create, can be standard, io1 and gp2. 
+* **size:** The size of volume to created. 
+* **availablezone:** Where to create the volume
+* **device:** The device used of this volume.
+* **mount:** Where should mount the volume.
+* **filesystem:** File system used to mount the device.
+
+Volume optional parameters:
+
+* **iops:** The IOPS used to create volume, *only to io1 type*
 * **snapshotid:** When informed, the volume is created from an existing snapshot. In this case the volume is not formatted, obviously.
-* **tags:** You can pass a list of key=values to add as tags to your volume. *[Optional]*
+* **tags:** You can pass a list of key=values to add as tags to your volume.
+* **id:** The id to load a already created instance. If you pass this property all other properties will be ignored.
 
 
 **IMPORTANT:** If you have new volumes (without ID property or snapshotId) a new machine will
@@ -139,6 +140,7 @@ volumes:
   - name: mongo-journal
     #id: vol-123456
     type: io1
+    availablezone: us-west-2a
     size: 25
     iops: 250
     device: /dev/xvdl
