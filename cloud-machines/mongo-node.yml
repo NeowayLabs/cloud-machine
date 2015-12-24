@@ -18,6 +18,7 @@ volumes:
     device: /dev/xvdk
     mount: /mongo-data
     filesystem: btrfs
+    availablezone: us-west-2a
 
   - name: mongo-journal
     type: io1
@@ -26,6 +27,7 @@ volumes:
     device: /dev/xvdl
     mount: /mongo-journal
     filesystem: btrfs
+    availablezone: us-west-2a
 
   - name: mongo-log
     type: io1
@@ -34,3 +36,4 @@ volumes:
     device: /dev/xvdm
     mount: /mongo-log
     filesystem: btrfs
+    availablezone: us-west-2a
