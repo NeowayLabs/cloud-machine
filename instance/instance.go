@@ -40,33 +40,35 @@ type Instance struct {
 	ShutdownBehavior     string
 	EnableAPITermination bool
 	PlacementGroupName   string
-	Tags                 []ec2.Tag
+	Tags                 []ec2.Tag // ec2.Instance already have this property but yml would need new section
 	ec2.Instance
 }
 
-func mergeInstances(instance *Instance, instanceRef *ec2.Instance) {
-	instance.Instance = *instanceRef
+func mergeInstances(instance *Instance, ec2Instance *ec2.Instance) {
+	instance.Instance = *ec2Instance
 	// Instance struct has some fields that is present in ec2.Instance
 	// We should rewrite this fields
-	instance.ID = instanceRef.InstanceId
-	instance.Type = instanceRef.InstanceType
-	instance.ImageID = instanceRef.ImageId
-	instance.SubnetID = instanceRef.SubnetId
-	instance.KeyName = instanceRef.KeyName
-	instance.AvailableZone = instanceRef.AvailZone
-	instance.EBSOptimized = instanceRef.EBSOptimized
-	instance.SecurityGroups = make([]string, len(instanceRef.SecurityGroups))
+	instance.ID = ec2Instance.InstanceId
+	instance.Type = ec2Instance.InstanceType
+	instance.ImageID = ec2Instance.ImageId
+	instance.SubnetID = ec2Instance.SubnetId
+	instance.KeyName = ec2Instance.KeyName
+	instance.AvailableZone = ec2Instance.AvailZone
+	instance.EBSOptimized = ec2Instance.EBSOptimized
+	instance.SecurityGroups = make([]string, len(ec2Instance.SecurityGroups))
 
-	for i, securityGroup := range instanceRef.SecurityGroups {
+	for i, securityGroup := range ec2Instance.SecurityGroups {
 		instance.SecurityGroups[i] = securityGroup.Id
 	}
 
-	instance.Tags = make([]ec2.Tag, 0)
-	for _, tag := range instanceRef.Tags {
-		if tag.Key == "Name" {
-			instance.Name = tag.Value
-		} else {
-			instance.Tags = append(instance.Tags, tag)
+	if len(ec2Instance.Tags) > 0 {
+		instance.Tags = make([]ec2.Tag, len(ec2Instance.Tags)-1)
+		for _, tag := range ec2Instance.Tags {
+			if tag.Key == "Name" {
+				instance.Name = tag.Value
+			} else {
+				instance.Tags[i] = tag
+			}
 		}
 	}
 }
@@ -92,20 +94,20 @@ func WaitUntilState(ec2Ref *ec2.EC2, instance *Instance, state string) error {
 
 // Get a instance, if Id was not passed a new instance will be created
 func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
-	var instanceRef ec2.Instance
+	var ec2Instance ec2.Instance
 	var err error
 	if instance.ID == "" {
 		logger.Printf("Creating new instance...\n")
-		instanceRef, err = Create(ec2Ref, instance)
+		ec2Instance, err = Create(ec2Ref, instance)
 		logger.Printf("--------- NEW INSTANCE ---------\n")
 	} else {
 		logger.Printf("Loading instance Id <%s>...\n", instance.ID)
-		instanceRef, err = Load(ec2Ref, instance)
+		ec2Instance, err = Load(ec2Ref, instance)
 		logger.Printf("--------- LOADING INSTANCE ---------\n")
 	}
 
 	if err != nil {
-		return instanceRef, err
+		return ec2Instance, err
 	}
 
 	logger.Printf("    Id: %s\n", instance.ID)
@@ -120,7 +122,7 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	logger.Printf("    EBS Optimized: %t\n", instance.EBSOptimized)
 	logger.Println("----------------------------------\n")
 
-	return instanceRef, nil
+	return ec2Instance, nil
 }
 
 // Load a instance passing its Id
@@ -136,10 +138,10 @@ func Load(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 		return ec2.Instance{}, fmt.Errorf("Any instance was found with instance Id <%s>", instance.ID)
 	}
 
-	instanceRef := resp.Reservations[0].Instances[0]
-	mergeInstances(instance, &instanceRef)
+	ec2Instance := resp.Reservations[0].Instances[0]
+	mergeInstances(instance, &ec2Instance)
 
-	return instanceRef, nil
+	return ec2Instance, nil
 }
 
 // Create new instance
@@ -190,21 +192,21 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 		return ec2.Instance{}, errors.New("Any instance was created!")
 	}
 
-	instanceRef := resp.Instances[0]
+	ec2Instance := resp.Instances[0]
 	tags := append(instance.Tags, ec2.Tag{"Name", instance.Name})
-	_, err = ec2Ref.CreateTags([]string{instanceRef.InstanceId}, tags)
+	_, err = ec2Ref.CreateTags([]string{ec2Instance.InstanceId}, tags)
 	if err != nil {
 		return ec2.Instance{}, err
 	}
 
-	mergeInstances(instance, &instanceRef)
+	mergeInstances(instance, &ec2Instance)
 
 	err = WaitUntilState(ec2Ref, instance, "running")
 	if err != nil {
 		return ec2.Instance{}, err
 	}
 
-	return instanceRef, nil
+	return ec2Instance, nil
 }
 
 // Terminate ...
