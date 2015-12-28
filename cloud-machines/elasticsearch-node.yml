@@ -3,7 +3,7 @@ instance:
   type: r3.2xlarge
   imageid: ami-85ada4b5
   region: us-west-2
-  defaultavailablezone: us-west-2a
+  availablezone: us-west-2a
   keyname: aws-keyname
   securitygroups: [sg-00000000]
   subnetid: subnet-abcd0000
