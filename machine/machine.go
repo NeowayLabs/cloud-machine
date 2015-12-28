@@ -51,23 +51,23 @@ func Get(machine *Machine, auth aws.Auth) error {
 	// get list of volumes to format
 	volumesToFormat := make([]volume.Volume, 0)
 	for key := range machine.Volumes {
-		myVolume := &machine.Volumes[key]
+		volumeConfig := &machine.Volumes[key]
 
 		format := false
-		if myVolume.ID == "" && myVolume.SnapshotID == "" {
+		if volumeConfig.ID == "" && volumeConfig.SnapshotID == "" {
 			format = true
 		}
 
-		_, err := volume.Get(ec2Ref, myVolume)
+		_, err := volume.Get(ec2Ref, volumeConfig)
 		if err != nil {
 			return err
 		}
 
 		if format == true {
-			volumesToFormat = append(volumesToFormat, *myVolume)
+			volumesToFormat = append(volumesToFormat, *volumeConfig)
 		}
 
-		myVolume.AvailableZone = machine.Instance.AvailableZone
+		volumeConfig.AvailableZone = machine.Instance.AvailableZone
 	}
 
 	// Create a machine to format theses volumes
@@ -100,8 +100,8 @@ func Get(machine *Machine, auth aws.Auth) error {
 
 // AttachVolumes ...
 func AttachVolumes(ec2Ref *ec2.EC2, InstanceID string, volumes []volume.Volume) error {
-	for _, myVolume := range volumes {
-		_, err := ec2Ref.AttachVolume(myVolume.ID, InstanceID, myVolume.Device)
+	for _, volumeConfig := range volumes {
+		_, err := ec2Ref.AttachVolume(volumeConfig.ID, InstanceID, volumeConfig.Device)
 		if err != nil {
 			reqError := err.(*ec2.Error)
 			if reqError.Code != "VolumeInUse" {
@@ -125,8 +125,8 @@ func FormatVolumes(ec2Ref *ec2.EC2, machine Machine, volumes []volume.Volume) er
 
 	// create specific cloud config to format volumes
 	var units string
-	for _, myVolume := range volumes {
-		units += getFormatAndMountUnit(myVolume)
+	for _, volumeConfig := range volumes {
+		units += getFormatAndMountUnit(volumeConfig)
 	}
 
 	err = ioutil.WriteFile(cloudConfigName, []byte(getFormatCloudConfig(units)), 0644)
@@ -171,8 +171,8 @@ func FormatVolumes(ec2Ref *ec2.EC2, machine Machine, volumes []volume.Volume) er
 	return nil
 }
 
-func getFormatAndMountUnit(myVolume volume.Volume) string {
-	mountUnitName := strings.Replace(strings.Trim(myVolume.Mount, "/"), "/", "-", -1)
+func getFormatAndMountUnit(volumeConfig volume.Volume) string {
+	mountUnitName := strings.Replace(strings.Trim(volumeConfig.Mount, "/"), "/", "-", -1)
 	return fmt.Sprintf(`
     - name: format-%[1]s.service
       command: start
@@ -196,7 +196,7 @@ func getFormatAndMountUnit(myVolume volume.Volume) string {
         What=%[2]s
         Where=%[4]s
         Type=%[3]s
-        Options=defaults,noatime,noexec,nobarrier`, myVolume.Name, myVolume.Device, myVolume.FileSystem, myVolume.Mount, mountUnitName)
+        Options=defaults,noatime,noexec,nobarrier`, volumeConfig.Name, volumeConfig.Device, volumeConfig.FileSystem, volumeConfig.Mount, mountUnitName)
 }
 
 func getFormatCloudConfig(units string) string {
