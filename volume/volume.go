@@ -27,11 +27,11 @@ type Volume struct {
 	Type          string
 	Size          int
 	IOPS          int64
+	SnapshotID    string
 	AvailableZone string
 	Device        string
 	Mount         string
 	FileSystem    string
-	SnapshotID    string
 	ec2.Volume
 }
 
