@@ -49,8 +49,8 @@ instance and how many volumes you need.
 which machine-config use and how many of this machine should run.
 
 **IMPORTANT:** Each machine will verify if you are creating new volumes, if yes
-a new provisory machine will be create only to format theses volumes, after
-format the machine will be automatically destroyed. Cost will be applied.
+a new provisory machine will be create only to format these volumes, after
+format the machine will be automatically destroyed. **Cost will be applied.**
 
 #### Machine UP
 
@@ -59,46 +59,44 @@ need pass to it a machine-config file. You can have two section, one to
 describe information about your instance and another one with information about
 your volumes.
 
-To instance you can use follow properties:
+Instance obligatory parameters:
+* **name:** It will be create a tag with Name key
+* **type:** The type of instance to create
+* **imageid:** The Image Id used to create the instance
+* **region:** Region used to create the instance
+* **keyname:** Key name used to permit access to instance
+* **securitygroups:** Array of security group Id
+* **subnetid:** Subnet Id of instance
 
-* **id:** The id to load a already created instance. *[Optional]*. If you pass
-this property all other properties will be ignored.
-* **name:** It will be create a tag with Name key. *[Required]*
-* **type:** The type of instance to create. *[Required]*
-* **imageid:** The Image Id used to create the instance. *[Required]*
-* **region:** Region used to create the instance. *[Required]*
-* **defaultavailablezone:** The default available zone to create volumes. *[Optional]*
-* **keyname:** Keyname used to permit access to instance. *[Required]*
-* **securitygroups:** Array of security group Id. *[Required]*
-* **subnetid:** Subnet Id of instance. *[Required]*
-* **cloudconfig:** File that will be used to pass as userdata to instance. *[Optional]*
-* **ebsoptimized:** If instance should be EBS Optimized, default is false. *[Optional]*
-* **shutdownbehavior:** When you shutdown the machine will terminate or stop, default is stop. *[Optional]*
-* **enableapitermination:** If you authorize terminate this instance by aws console, cli, etc, default is false. *[Optional]*
-* **tags:** You can pass a list of key=values to add as tags to your instance. *[Optional]*
+Instance optional parameters:
+* **id:** The id to load a already created instance. If you pass this property all other properties will be ignored
+* **availablezone:** The available zone to create the instance and volumes
+* **cloudconfig:** File that will be used to pass as userdata to instance
+* **ebsoptimized:** If instance should be EBS Optimized, default is false
+* **shutdownbehavior:** When you shutdown the machine will *terminate* or *stop*, default is stop
+* **enableapitermination:** If you authorize terminate this instance by aws console, cli, etc, default is false
+* **tags:** You can pass a list of key=values to add these tags to your instance
 
-To each volume you can use follow properties:
+Volume obligatory parameters:
+* **name:** It will be create a tag with Name key
+* **type:** The type of volume to create, can be standard, io1 and gp2
+* **size:** The size of volume to created
+* **device:** The device used of this volume
+* **mount:** Where should mount the volume
+* **filesystem:** File system used to mount the device
 
-* **id:** The id to load a already created instance. *[Optional]*. If you pass
-this property all other properties will be ignored.
-* **name:** It will be create a tag with Name key. *[Required]*
-* **type:** The type of volume to create, can be standard, io1 and gp2. *[Required]*
-* **size:** The size of volume to created. *[Required]*
-* **iops:** The IOPS used to create volume, *only to io1 type* *[Optional]*
-* **availablezone:** Where create the volume, this property overwrite
-*defaultavailablezone* of instance. *[Optional]*
-* **device:** The device used of this volume. *[Required]*
-* **mount:** Where should mount the volume. *[Required]*
-* **filesystem:** File system used to mount the device. *[Required]*
-* **snapshotid:** When informed, the volume is created from an existing snapshot. In this case the volume is not formatted, obviously.
-* **tags:** You can pass a list of key=values to add as tags to your volume. *[Optional]*
+Volume optional parameters:
 
+* **id:** The id to load a already created instance. If you pass this property all other properties will be ignored
+* **snapshotid:** When informed, the volume is created from an existing snapshot. In this case the volume is not formatted, obviously
+* **iops:** The IOPS used to create volume, *only to io1 type*
+* **tags:** You can pass a list of key=values to add as tags to your volume
 
 **IMPORTANT:** If you have new volumes (without ID property or snapshotId) a new machine will
-be created only to format this volume, after format the machine will be
-automatically destroyed. Cost will be applied.
+be created only to format this volume, after format the machine will be automatically destroyed. **Cost will be applied.**
 
-**IMPORTANT:** If you want to create a volume from a snapshot and increase the size of the new volume, you need to run a resize2fs as [Aws Increase Volumes](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-expand-volume.html)
+**IMPORTANT:** If you want to create a volume from a snapshot and increase the size of the new volume, you need to run
+a resize2fs as [Aws Increase Volumes](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-expand-volume.html)
 
 Here we have an example of machine-config
 
@@ -109,7 +107,7 @@ instance:
   type: r3.xlarge
   imageid: ami-5d4d486d
   region: us-west-2
-  defaultavailablezone: us-west-2a
+  availablezone: us-west-2a
   keyname: aws-keyname
   securitygroups: [sg-00000000,sg-00000001]
   subnetid: subnet-abcd0000
@@ -118,23 +116,22 @@ instance:
   shutdownbehavior: stop
   enableapitermination: false
   tags:
-    - key1: value1
-    - key2: value2
-    - key3: value3
+    - { key: instancekey1: value: instancevalue1 }
+    - { key: instancekey2: value: instancevalue2 }
+    - { key: instancekey3: value: instancevalue3 }
 
 volumes:
   - name: mongo-data
     type: io1
     size: 200
     iops: 1000
-    availablezone: us-west-2a
     device: /dev/xvdk
     mount: /data
     filesystem: ext4
     tags:
-    - key1: value1
-    - key2: value2
-    - key3: value3
+      - { key: volumekey1: value: volumevalue1 }
+      - { key: volumekey2: value: volumevalue2 }
+      - { key: volumekey3: value: volumevalue3 }
 
   - name: mongo-journal
     #id: vol-123456
@@ -146,12 +143,17 @@ volumes:
     filesystem: ext4
 ```
 
-To run you need export AWS_ACCESS_KEY and AWS_SECRET_KEY and pass machine-config
-file
+To run you need export AWS_ACCESS_KEY and AWS_SECRET_KEY or type ```aws configure``` and pass machine-config
+file 
 
 ```
 export AWS_ACCESS_KEY=<your access key>
 export AWS_SECRET_KEY=<your secret key>
+
+#OR
+
+aws configure
+
 ./machine-up ./cloud-machine/mongo-node.yml
 ```
 
@@ -164,11 +166,11 @@ should run.
 
 In cluster-config you can pass follow properties:
 
-* **machine:** The file used to describe machine ([see above](#machine-up)). *[Required]*
-* **nodes:** How many machines should be create. *[Required]*
+* **machine:** The file used to describe machine ([see above](#machine-up))
+* **nodes:** How many machines should be create
 
-Sometimes you need use some default value to all your instances, for that leave theses fields empty inside in your
-*machine spec*, and fill inside of default in your *cloud spec*. This is very helpful when you need update you image id
+Sometimes you need use some default value to all your instances, for that leave theses fields empty inside of your
+*machine spec*, and fill inside of your default *cloud spec*. This is very helpful when you need update you image id
 or if you want create your infra in another region for example, in this case you only need update in one file.
 
 Here we have an example of cluster-config
@@ -181,11 +183,11 @@ default:
   keyname: aws-keyname
   securitygroups: [sg-00000000,sg-00000001]
   subnetid: subnet-abcd0000
-  defaultavailablezone: us-west-2a
+  availablezone: us-west-2a
   tags:
-    - key1: value1
-    - key2: value2
-    - key3: value3
+    - { key: volumeAndInstanceKey1: value: volumeAndInstanceValue1 }
+    - { key: volumeAndInstanceKey2: value: volumeAndInstanceValue2 }
+    - { key: volumeAndInstanceKey3: value: volumeAndInstanceValue3 }
 
 clusters:
   - machine: cloud-machine/mongo-node.yml
@@ -195,12 +197,17 @@ clusters:
     nodes: 2
 ```
 
-To run you need export AWS_ACCESS_KEY and AWS_SECRET_KEY and pass cluster-config
-file
+To run you need export AWS_ACCESS_KEY and AWS_SECRET_KEY or type ```aws configure``` and pass cluster-config
+file 
 
 ```
 export AWS_ACCESS_KEY=<your access key>
 export AWS_SECRET_KEY=<your secret key>
+
+#OR
+
+aws configure
+
 ./cluster-up ./cloud-machine/app-cluster.yml
 ```
 
