@@ -32,6 +32,7 @@ type Volume struct {
 	Device        string
 	Mount         string
 	FileSystem    string
+	Tags          []ec2.Tag // ec2.Volume already have this property but yml would need new section
 	ec2.Volume
 }
 
@@ -46,10 +47,14 @@ func mergeVolumes(volume *Volume, ec2Volume *ec2.Volume) {
 	volume.AvailableZone = ec2Volume.AvailZone
 	volume.Type = ec2Volume.VolumeType
 
-	for _, tag := range ec2Volume.Tags {
-		if tag.Key == "Name" {
-			volume.Name = tag.Value
-			break
+	if len(ec2Volume.Tags) > 0 {
+		volume.Tags = make([]ec2.Tag, len(ec2Volume.Tags)-1)
+		for i, tag := range ec2Volume.Tags {
+			if tag.Key == "Name" {
+				volume.Name = tag.Value
+			} else {
+				volume.Tags[i] = tag
+			}
 		}
 	}
 }
@@ -105,6 +110,12 @@ func Get(ec2Ref *ec2.EC2, volume *Volume) (ec2Volume ec2.Volume, err error) {
 	logger.Printf("    Device: %s\n", volume.Device)
 	logger.Printf("    Mount: %s\n", volume.Mount)
 	logger.Printf("    File System: %s\n", volume.FileSystem)
+	if len(volume.Tags) > 0 {
+		logger.Printf("    Tags:\n")
+		for _, tag := range volume.Tags {
+			logger.Printf("        %s: %s\n", tag.Key, tag.Value)
+		}
+	}
 	logger.Println("----------------------------------\n")
 
 	return
