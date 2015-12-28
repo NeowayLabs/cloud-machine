@@ -58,6 +58,8 @@ func Get(machine *Machine, auth aws.Auth) error {
 			format = true
 		}
 
+		volumeConfig.AvailableZone = machine.Instance.AvailableZone
+
 		_, err := volume.Get(ec2Ref, volumeConfig)
 		if err != nil {
 			return err
@@ -66,8 +68,6 @@ func Get(machine *Machine, auth aws.Auth) error {
 		if format == true {
 			volumesToFormat = append(volumesToFormat, *volumeConfig)
 		}
-
-		volumeConfig.AvailableZone = machine.Instance.AvailableZone
 	}
 
 	// Create a machine to format theses volumes
