@@ -37,7 +37,8 @@ type (
 		KeyName              string
 		SecurityGroups       []string
 		SubnetID             string
-		DefaultAvailableZone string
+		AvailableZone        string
+		DefaultAvailableZone string // backward compatibility, use availablezone instead
 		Tags                 []ec2.Tag
 	}
 )
@@ -59,6 +60,12 @@ func main() {
 	err = yaml.Unmarshal(clusterContent, &clusters)
 	if err != nil {
 		logger.Fatal("Error reading cluster file: %s", err.Error())
+	}
+
+	if clusters.Default.AvailableZone == "" {
+		if clusters.Default.DefaultAvailableZone != "" {
+			clusters.Default.AvailableZone = clusters.Default.DefaultAvailableZone
+		}
 	}
 
 	// First verify if I can open all machine files
