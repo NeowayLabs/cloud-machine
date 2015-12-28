@@ -154,23 +154,23 @@ func main() {
 
 	machine.SetLogger(ioutil.Discard, "", 0)
 
-	for key, myCluster := range machines {
+	for key, clusterConfig := range machines {
 		fmt.Printf("================ Running machines of %d. cluster ================\n", key+1)
 
-		for i := 1; i <= myCluster.Nodes; i++ {
-			machineConfig := myCluster.Machine
+		for i := 1; i <= clusterConfig.Nodes; i++ {
+			machineConfig := clusterConfig.Machine
 			machineConfig.Volumes = make([]volume.Volume, len(machineConfig.Volumes))
 
 			// append machine number to name of instance
 			machineConfig.Instance.Name += fmt.Sprintf("-%d", i)
 
 			// append machine number to name of volume
-			for key := range myCluster.Machine.Volumes {
-				referenceVolume := &myCluster.Machine.Volumes[key]
+			for key := range clusterConfig.Machine.Volumes {
+				volumeRef := &clusterConfig.Machine.Volumes[key]
 
-				myVolume := *referenceVolume
-				myVolume.Name += fmt.Sprintf("-%d", i)
-				machineConfig.Volumes[key] = myVolume
+				volumeConfig := *volumeRef
+				volumeConfig.Name += fmt.Sprintf("-%d", i)
+				machineConfig.Volumes[key] = volumeConfig
 			}
 
 			fmt.Printf("Running machine: %s\n", machineConfig.Instance.Name)
@@ -178,8 +178,9 @@ func main() {
 			if err != nil {
 				logger.Fatal("Error getting machine: %s", err.Error())
 			}
+
 			fmt.Printf("Machine Id <%s>, IP Address <%s>\n", machineConfig.Instance.ID, machineConfig.Instance.PrivateIPAddress)
-			if i < myCluster.Nodes {
+			if i < clusterConfig.Nodes {
 				fmt.Println("----------------------------------")
 			}
 		}
