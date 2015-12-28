@@ -108,13 +108,13 @@ func main() {
 		if machineConfig.Instance.SubnetID == "" {
 			machineConfig.Instance.SubnetID = clusters.Default.SubnetID
 		}
-		if machineConfig.Instance.DefaultAvailableZone == "" {
-			machineConfig.Instance.AvailableZone = clusters.Default.DefaultAvailableZone
-		} else {
-			machineConfig.Instance.AvailableZone = machineConfig.Instance.DefaultAvailableZone
-		}
+
 		if machineConfig.Instance.AvailableZone == "" {
-			logger.Fatal("Cannot create machine without set 'defaultavailablezone' in cluster file or 'availablezone' in machine file, instance section")
+			if machineConfig.Instance.DefaultAvailableZone != "" {
+				machineConfig.Instance.AvailableZone = machineConfig.Instance.DefaultAvailableZone
+			} else {
+				machineConfig.Instance.AvailableZone = clusters.Default.AvailableZone
+			}
 		}
 
 		for _, tag := range clusters.Default.Tags {
