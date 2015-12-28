@@ -132,6 +132,10 @@ func Load(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
 
 // Create new volume
 func Create(ec2Ref *ec2.EC2, volume *Volume) (ec2.Volume, error) {
+	if volume.AvailableZone == "" {
+		return ec2.Volume{}, errors.New("volume.AvailableZone is a required parameter")
+	}
+
 	options := ec2.CreateVolume{
 		VolumeType: volume.Type,
 		AvailZone:  volume.AvailableZone,
