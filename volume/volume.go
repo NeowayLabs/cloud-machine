@@ -47,14 +47,12 @@ func mergeVolumes(volume *Volume, ec2Volume *ec2.Volume) {
 	volume.AvailableZone = ec2Volume.AvailZone
 	volume.Type = ec2Volume.VolumeType
 
-	if len(ec2Volume.Tags) > 0 {
-		volume.Tags = make([]ec2.Tag, len(ec2Volume.Tags)-1)
-		for i, tag := range ec2Volume.Tags {
-			if tag.Key == "Name" {
-				volume.Name = tag.Value
-			} else {
-				volume.Tags[i] = tag
-			}
+	volume.Tags = make([]ec2.Tag, 0)
+	for _, tag := range ec2Volume.Tags {
+		if tag.Key == "Name" {
+			volume.Name = tag.Value
+		} else {
+			volume.Tags = append(volume.Tags, tag)
 		}
 	}
 }

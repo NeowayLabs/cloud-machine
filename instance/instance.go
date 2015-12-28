@@ -61,14 +61,12 @@ func mergeInstances(instance *Instance, ec2Instance *ec2.Instance) {
 		instance.SecurityGroups[i] = securityGroup.Id
 	}
 
-	if len(ec2Instance.Tags) > 0 {
-		instance.Tags = make([]ec2.Tag, len(ec2Instance.Tags)-1)
-		for i, tag := range ec2Instance.Tags {
-			if tag.Key == "Name" {
-				instance.Name = tag.Value
-			} else {
-				instance.Tags[i] = tag
-			}
+	instance.Tags = make([]ec2.Tag, 0)
+	for _, tag := range ec2Instance.Tags {
+		if tag.Key == "Name" {
+			instance.Name = tag.Value
+		} else {
+			instance.Tags = append(instance.Tags, tag)
 		}
 	}
 }
