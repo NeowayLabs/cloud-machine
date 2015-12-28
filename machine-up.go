@@ -23,8 +23,8 @@ func main() {
 		logger.Fatal("Error open machine file: %s", err.Error())
 	}
 
-	var myMachine machine.Machine
-	err = yaml.Unmarshal(machineContent, &myMachine)
+	var machineConfig machine.Machine
+	err = yaml.Unmarshal(machineContent, &machineConfig)
 	if err != nil {
 		logger.Fatal("Error reading machine file: %s", err.Error())
 	}
@@ -34,15 +34,15 @@ func main() {
 		logger.Fatal("Error reading aws credentials: %s", err.Error())
 	}
 
-	if myMachine.Instance.AvailableZone == "" {
-		if myMachine.Instance.DefaultAvailableZone == "" {
-			logger.Fatal("Cannot create machine without set availablezone' in machine file, instance section")
+	if machineConfig.Instance.AvailableZone == "" {
+		if machineConfig.Instance.DefaultAvailableZone == "" {
+			logger.Fatal("Cannot create machine, instance.availablezone is missing")
 		} else {
-			myMachine.Instance.AvailableZone = myMachine.Instance.DefaultAvailableZone
+			machineConfig.Instance.AvailableZone = machineConfig.Instance.DefaultAvailableZone
 		}
 	}
 
-	err = machine.Get(&myMachine, auth)
+	err = machine.Get(&machineConfig, auth)
 	if err != nil {
 		logger.Fatal("Error getting machine: %s", err.Error())
 	}
