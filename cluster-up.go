@@ -64,66 +64,66 @@ func main() {
 	// First verify if I can open all machine files
 	machines := make([]Cluster, len(clusters.Clusters))
 	for key := range clusters.Clusters {
-		myCluster := &clusters.Clusters[key]
+		clusterConfig := &clusters.Clusters[key]
 
-		machineContent, err := ioutil.ReadFile(myCluster.Machine)
+		machineContent, err := ioutil.ReadFile(clusterConfig.Machine)
 		if err != nil {
 			logger.Fatal("Error open machine file: %s", err.Error())
 		}
 
-		var myMachine machine.Machine
-		err = yaml.Unmarshal(machineContent, &myMachine)
+		var machineConfig machine.Machine
+		err = yaml.Unmarshal(machineContent, &machineConfig)
 		if err != nil {
 			logger.Fatal("Error reading machine file: %s", err.Error())
 		}
 
 		// Verify if cloud-config file exists
-		if myMachine.Instance.CloudConfig != "" {
-			_, err := os.Stat(myMachine.Instance.CloudConfig)
+		if machineConfig.Instance.CloudConfig != "" {
+			_, err := os.Stat(machineConfig.Instance.CloudConfig)
 			if err != nil {
 				logger.Fatal("Error reading cloud-config: %s", err.Error())
 			}
 		}
 
 		// Set default values of cluster to machine
-		if myMachine.Instance.ImageID == "" {
-			myMachine.Instance.ImageID = clusters.Default.ImageID
+		if machineConfig.Instance.ImageID == "" {
+			machineConfig.Instance.ImageID = clusters.Default.ImageID
 		}
-		if myMachine.Instance.Region == "" {
-			myMachine.Instance.Region = clusters.Default.Region
+		if machineConfig.Instance.Region == "" {
+			machineConfig.Instance.Region = clusters.Default.Region
 		}
-		if myMachine.Instance.KeyName == "" {
-			myMachine.Instance.KeyName = clusters.Default.KeyName
+		if machineConfig.Instance.KeyName == "" {
+			machineConfig.Instance.KeyName = clusters.Default.KeyName
 		}
-		if len(myMachine.Instance.SecurityGroups) == 0 {
-			myMachine.Instance.SecurityGroups = clusters.Default.SecurityGroups
+		if len(machineConfig.Instance.SecurityGroups) == 0 {
+			machineConfig.Instance.SecurityGroups = clusters.Default.SecurityGroups
 		}
-		if myMachine.Instance.SubnetID == "" {
-			myMachine.Instance.SubnetID = clusters.Default.SubnetID
+		if machineConfig.Instance.SubnetID == "" {
+			machineConfig.Instance.SubnetID = clusters.Default.SubnetID
 		}
-		if myMachine.Instance.DefaultAvailableZone == "" {
-			myMachine.Instance.AvailableZone = clusters.Default.DefaultAvailableZone
+		if machineConfig.Instance.DefaultAvailableZone == "" {
+			machineConfig.Instance.AvailableZone = clusters.Default.DefaultAvailableZone
 		} else {
-			myMachine.Instance.AvailableZone = myMachine.Instance.DefaultAvailableZone
+			machineConfig.Instance.AvailableZone = machineConfig.Instance.DefaultAvailableZone
 		}
-		if myMachine.Instance.AvailableZone == "" {
+		if machineConfig.Instance.AvailableZone == "" {
 			logger.Fatal("Cannot create machine without set 'defaultavailablezone' in cluster file or 'availablezone' in machine file, instance section")
 		}
 
 		for _, tag := range clusters.Default.Tags {
 			addTag := true
-			for _, instanceTag := range myMachine.Instance.Tags {
+			for _, instanceTag := range machineConfig.Instance.Tags {
 				if strings.EqualFold(instanceTag.Key, tag.Key) {
 					addTag = false
 				}
 			}
 
 			if addTag {
-				myMachine.Instance.Tags = append(myMachine.Instance.Tags, tag)
+				machineConfig.Instance.Tags = append(machineConfig.Instance.Tags, tag)
 			}
 
 			addTag = true
-			for k, volume := range myMachine.Volumes {
+			for k, volume := range machineConfig.Volumes {
 				for _, volumeTag := range volume.Tags {
 					if strings.EqualFold(volumeTag.Key, tag.Key) {
 						addTag = false
@@ -132,12 +132,12 @@ func main() {
 				}
 
 				if addTag {
-					myMachine.Volumes[k].Tags = append(myMachine.Volumes[k].Tags, tag)
+					machineConfig.Volumes[k].Tags = append(machineConfig.Volumes[k].Tags, tag)
 				}
 			}
 		}
 
-		machines[key] = Cluster{Machine: myMachine, Nodes: myCluster.Nodes}
+		machines[key] = Cluster{Machine: machineConfig, Nodes: clusterConfig.Nodes}
 	}
 
 	auth, err := AwsAuth()
@@ -151,11 +151,11 @@ func main() {
 		fmt.Printf("================ Running machines of %d. cluster ================\n", key+1)
 
 		for i := 1; i <= myCluster.Nodes; i++ {
-			myMachine := myCluster.Machine
-			myMachine.Volumes = make([]volume.Volume, len(myMachine.Volumes))
+			machineConfig := myCluster.Machine
+			machineConfig.Volumes = make([]volume.Volume, len(machineConfig.Volumes))
 
 			// append machine number to name of instance
-			myMachine.Instance.Name += fmt.Sprintf("-%d", i)
+			machineConfig.Instance.Name += fmt.Sprintf("-%d", i)
 
 			// append machine number to name of volume
 			for key := range myCluster.Machine.Volumes {
@@ -163,15 +163,15 @@ func main() {
 
 				myVolume := *referenceVolume
 				myVolume.Name += fmt.Sprintf("-%d", i)
-				myMachine.Volumes[key] = myVolume
+				machineConfig.Volumes[key] = myVolume
 			}
 
-			fmt.Printf("Running machine: %s\n", myMachine.Instance.Name)
-			err = machine.Get(&myMachine, auth)
+			fmt.Printf("Running machine: %s\n", machineConfig.Instance.Name)
+			err = machine.Get(&machineConfig, auth)
 			if err != nil {
 				logger.Fatal("Error getting machine: %s", err.Error())
 			}
-			fmt.Printf("Machine Id <%s>, IP Address <%s>\n", myMachine.Instance.ID, myMachine.Instance.PrivateIPAddress)
+			fmt.Printf("Machine Id <%s>, IP Address <%s>\n", machineConfig.Instance.ID, machineConfig.Instance.PrivateIPAddress)
 			if i < myCluster.Nodes {
 				fmt.Println("----------------------------------")
 			}
