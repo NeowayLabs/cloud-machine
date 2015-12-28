@@ -93,9 +93,7 @@ func WaitUntilState(ec2Ref *ec2.EC2, instance *Instance, state string) error {
 }
 
 // Get a instance, if Id was not passed a new instance will be created
-func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
-	var ec2Instance ec2.Instance
-	var err error
+func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2Instance ec2.Instance, err error) {
 	if instance.ID == "" {
 		logger.Printf("Creating new instance...\n")
 		ec2Instance, err = Create(ec2Ref, instance)
@@ -107,7 +105,7 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	}
 
 	if err != nil {
-		return ec2Instance, err
+		return
 	}
 
 	logger.Printf("    Id: %s\n", instance.ID)
@@ -120,9 +118,15 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	logger.Printf("    PlacementGroupName: %+v\n", instance.PlacementGroupName)
 	logger.Printf("    Subnet Id: %s\n", instance.SubnetID)
 	logger.Printf("    EBS Optimized: %t\n", instance.EBSOptimized)
+	if len(instance.Tags) > 0 {
+		logger.Printf("    Tags:\n")
+		for _, tag := range instance.Tags {
+			logger.Printf("        %s: %s\n", tag.Key, tag.Value)
+		}
+	}
 	logger.Println("----------------------------------\n")
 
-	return ec2Instance, nil
+	return
 }
 
 // Load a instance passing its Id
