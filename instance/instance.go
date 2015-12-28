@@ -63,7 +63,7 @@ func mergeInstances(instance *Instance, ec2Instance *ec2.Instance) {
 
 	if len(ec2Instance.Tags) > 0 {
 		instance.Tags = make([]ec2.Tag, len(ec2Instance.Tags)-1)
-		for _, tag := range ec2Instance.Tags {
+		for i, tag := range ec2Instance.Tags {
 			if tag.Key == "Name" {
 				instance.Name = tag.Value
 			} else {
