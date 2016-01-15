@@ -1,14 +1,12 @@
 package instance
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"text/template"
 	"time"
 
 	"gopkg.in/amz.v3/ec2"
@@ -160,19 +158,12 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 	}
 
 	if instance.CloudConfig != "" {
-		cloudConfigTemplate, err := ioutil.ReadFile(instance.CloudConfig)
+		userdata, err := ioutil.ReadFile(instance.CloudConfig)
 		if err != nil {
 			panic(err.Error())
 		}
 
-		tpl := template.Must(template.New("cloudConfig").Parse(string(cloudConfigTemplate)))
-
-		cloudConfig := new(bytes.Buffer)
-		if err = tpl.Execute(cloudConfig, instance); err != nil {
-			panic(err.Error())
-		}
-
-		options.UserData = cloudConfig.Bytes()
+		options.UserData = userdata
 	}
 
 	if instance.ShutdownBehavior != "" {
