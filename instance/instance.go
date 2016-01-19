@@ -38,6 +38,7 @@ type Instance struct {
 	ShutdownBehavior     string
 	EnableAPITermination bool
 	PlacementGroupName   string
+	IAM                  string
 	Tags                 []ec2.Tag // ec2.Instance already have this property but yml would need new section
 	ec2.Instance
 }
@@ -53,6 +54,7 @@ func mergeInstances(instance *Instance, ec2Instance *ec2.Instance) {
 	instance.KeyName = ec2Instance.KeyName
 	instance.AvailableZone = ec2Instance.AvailZone
 	instance.EBSOptimized = ec2Instance.EBSOptimized
+	instance.IAM = ec2Instance.IAMInstanceProfile
 	instance.SecurityGroups = make([]string, len(ec2Instance.SecurityGroups))
 
 	for i, securityGroup := range ec2Instance.SecurityGroups {
@@ -114,6 +116,7 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2Instance ec2.Instance, err err
 	logger.Printf("    PlacementGroupName: %+v\n", instance.PlacementGroupName)
 	logger.Printf("    Subnet Id: %s\n", instance.SubnetID)
 	logger.Printf("    EBS Optimized: %t\n", instance.EBSOptimized)
+	logger.Printf("    IAM: %t\n", instance.IAM)
 	if len(instance.Tags) > 0 {
 		logger.Printf("    Tags:\n")
 		for _, tag := range instance.Tags {
@@ -155,6 +158,7 @@ func Create(ec2Ref *ec2.EC2, instance *Instance) (ec2.Instance, error) {
 		EBSOptimized:          instance.EBSOptimized,
 		DisableAPITermination: !instance.EnableAPITermination,
 		AvailZone:             instance.AvailableZone,
+		IAMInstanceProfile:    instance.IAM,
 	}
 
 	if instance.CloudConfig != "" {
