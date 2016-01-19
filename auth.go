@@ -42,7 +42,9 @@ func AwsAuth() (auth aws.Auth, err error) {
 
 	file, err := ini.LoadFile("~/.aws/credentials")
 	if err != nil {
-		err = errors.New("You need inform your AWS credentials using a) AWS_ACCESS_KEY and AWS_SECRET_KEY; b) -access-key and -secret-key; c) aws configure.")
+		if err == ErrNotExist {
+			err = errors.New("You need inform your AWS credentials using a) AWS_ACCESS_KEY and AWS_SECRET_KEY; b) -access-key and -secret-key; c) aws configure.")
+		}
 		return
 	}
 
