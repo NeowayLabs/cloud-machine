@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"os"
 
 	"github.com/vaughan0/go-ini"
 
@@ -42,7 +43,7 @@ func AwsAuth() (auth aws.Auth, err error) {
 
 	file, err := ini.LoadFile("~/.aws/credentials")
 	if err != nil {
-		if err == ErrNotExist {
+		if err == os.ErrNotExist {
 			err = errors.New("You need inform your AWS credentials using a) AWS_ACCESS_KEY and AWS_SECRET_KEY; b) -access-key and -secret-key; c) aws configure.")
 		}
 		return
