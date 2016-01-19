@@ -116,9 +116,9 @@ instance:
   shutdownbehavior: stop
   enableapitermination: false
   tags:
-    - { key: instancekey1: value: instancevalue1 }
-    - { key: instancekey2: value: instancevalue2 }
-    - { key: instancekey3: value: instancevalue3 }
+    - { key: instancekey1, value: instancevalue1 }
+    - { key: instancekey2, value: instancevalue2 }
+    - { key: instancekey3, value: instancevalue3 }
 
 volumes:
   - name: mongo-data
@@ -129,9 +129,9 @@ volumes:
     mount: /data
     filesystem: ext4
     tags:
-      - { key: volumekey1: value: volumevalue1 }
-      - { key: volumekey2: value: volumevalue2 }
-      - { key: volumekey3: value: volumevalue3 }
+      - { key: volumekey1, value: volumevalue1 }
+      - { key: volumekey2, value: volumevalue2 }
+      - { key: volumekey3, value: volumevalue3 }
 
   - name: mongo-journal
     #id: vol-123456
@@ -185,9 +185,9 @@ default:
   subnetid: subnet-abcd0000
   availablezone: us-west-2a
   tags:
-    - { key: volumeAndInstanceKey1: value: volumeAndInstanceValue1 }
-    - { key: volumeAndInstanceKey2: value: volumeAndInstanceValue2 }
-    - { key: volumeAndInstanceKey3: value: volumeAndInstanceValue3 }
+    - { key: volumeAndInstanceKey1, value: volumeAndInstanceValue1 }
+    - { key: volumeAndInstanceKey2, value: volumeAndInstanceValue2 }
+    - { key: volumeAndInstanceKey3, value: volumeAndInstanceValue3 }
 
 clusters:
   - machine: cloud-machine/mongo-node.yml
