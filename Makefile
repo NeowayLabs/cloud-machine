@@ -3,7 +3,7 @@ WORKDIR="github.com/NeowayLabs/cloud-machine"
 IMAGENAME=neowaylabs/cloud-machine
 IMAGE=$(IMAGENAME):$(version)
 
-all: machine-up cluster-up
+all: goget machine-up cluster-up
 	@echo "Created: machine-up & cluster-up"
 
 goget:
