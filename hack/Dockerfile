@@ -25,5 +25,4 @@ ENV CGO_ENABLED 0
 # Upload docker source
 COPY . /go/src/github.com/NeowayLabs/cloud-machine
 
-# Grab Go's cover tool for dead-simple code coverage testing
 RUN go get -d

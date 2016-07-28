@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ var (
 )
 
 // AwsAuth ...
-func AwsAuth() (auth aws.Auth, err error) {
+func Aws() (auth aws.Auth, err error) {
 	auth.AccessKey = *accessKey
 	auth.SecretKey = *secretKey
 

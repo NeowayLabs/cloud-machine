@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/NeowayLabs/cloud-machine/auth"
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/logger"
 	"gopkg.in/yaml.v2"
@@ -29,7 +30,7 @@ func main() {
 		logger.Fatal("Error reading machine file: %s", err.Error())
 	}
 
-	auth, err := AwsAuth()
+	auth, err := auth.Aws()
 	if err != nil {
 		logger.Fatal("Error reading aws credentials: %s", err.Error())
 	}
