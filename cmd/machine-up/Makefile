@@ -3,7 +3,7 @@ all: build install
 build:
 	go build
 
-static:
+build-static:
 	CGO_ENABLED=0 go build -v -a -installsuffix cgo
 
 install:
