@@ -1,4 +1,4 @@
-version ?= 1.0
+version ?= latest
 WORKDIR="github.com/NeowayLabs/cloud-machine"
 IMAGENAME=neowaylabs/cloud-machine
 IMAGE=$(IMAGENAME):$(version)
