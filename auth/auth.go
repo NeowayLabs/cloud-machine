@@ -2,51 +2,38 @@ package auth
 
 import (
 	"errors"
-	"flag"
+	"fmt"
 	"os"
+	"os/user"
 
 	"github.com/vaughan0/go-ini"
 
 	"gopkg.in/amz.v3/aws"
 )
 
-var (
-	accessKey = flag.String("access-key", "", "AWS Access Key")
-	secretKey = flag.String("secret-key", "", "AWS Secret Key")
-)
+// Aws get the AWS credentials from environment variables or
+// from the file ~/.aws/credentials.
+func Aws() (aws.Auth, error) {
+	auth, err := aws.EnvAuth()
 
-// AwsAuth ...
-func Aws() (auth aws.Auth, err error) {
-	auth.AccessKey = *accessKey
-	auth.SecretKey = *secretKey
-
-	if auth.AccessKey != "" && auth.SecretKey != "" {
-		return
-	} else if auth.AccessKey == "" && auth.SecretKey != "" {
-		err = errors.New("-access-key not found in your command line")
-		return
-	} else if auth.AccessKey != "" && auth.SecretKey == "" {
-		err = errors.New("-secret-key not found in your command line")
-		return
-	}
-
-	auth, err = aws.EnvAuth()
 	if err == nil {
-		return
-	} else if auth.AccessKey == "" && auth.SecretKey != "" {
-		err = errors.New("AWS_ACCESS_KEY not found in environment")
-		return
-	} else if auth.AccessKey != "" && auth.SecretKey == "" {
-		err = errors.New("AWS_SECRET_KEY not found in environment")
-		return
+		return auth, nil
 	}
 
-	file, err := ini.LoadFile("~/.aws/credentials")
+	userInfo, err := user.Current()
+
+	if err != nil || userInfo.HomeDir == "" {
+		return aws.Auth{}, fmt.Errorf("Home directory not found: %s", err.Error())
+	}
+
+	file, err := ini.LoadFile(userInfo.HomeDir + "/.aws/credentials")
+
 	if err != nil {
 		if err == os.ErrNotExist {
 			err = errors.New("You need inform your AWS credentials using a) AWS_ACCESS_KEY and AWS_SECRET_KEY; b) -access-key and -secret-key; c) aws configure.")
 		}
-		return
+
+		return aws.Auth{}, err
 	}
 
 	auth.AccessKey, _ = file.Get("default", "aws_access_key_id")
@@ -54,8 +41,8 @@ func Aws() (auth aws.Auth, err error) {
 
 	if auth.AccessKey == "" || auth.SecretKey == "" {
 		err = errors.New("Your credentials ~/.aws/credentials is not valid")
-		return
+		return aws.Auth{}, err
 	}
 
-	return
+	return auth, nil
 }
