@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/NeowayLabs/cloud-machine/auth"
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/cloud-machine/volume"
 	"github.com/NeowayLabs/logger"
@@ -147,7 +148,7 @@ func main() {
 		machines[key] = Cluster{Machine: machineConfig, Nodes: clusterConfig.Nodes}
 	}
 
-	auth, err := AwsAuth()
+	auth, err := auth.Aws()
 	if err != nil {
 		logger.Fatal("Error reading aws credentials: %s", err.Error())
 	}

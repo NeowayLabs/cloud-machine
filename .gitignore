@@ -1,2 +1,2 @@
-cluster-up
-machine-up
+cmd/machine-up/machine-up
+cmd/cluster-up/cluster-up
