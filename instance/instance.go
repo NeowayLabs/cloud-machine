@@ -115,8 +115,8 @@ func Get(ec2Ref *ec2.EC2, instance *Instance) (ec2Instance ec2.Instance, err err
 	logger.Printf("    Security Groups: %+v\n", instance.SecurityGroups)
 	logger.Printf("    PlacementGroupName: %+v\n", instance.PlacementGroupName)
 	logger.Printf("    Subnet Id: %s\n", instance.SubnetID)
-	logger.Printf("    EBS Optimized: %t\n", instance.EBSOptimized)
-	logger.Printf("    IAM: %s\n", instance.IAM)
+	logger.Printf("    EBS Optimized: %s\n", instance.EBSOptimized)
+	logger.Printf("    IAM: %s\n", instance.IAM)	
 	if len(instance.Tags) > 0 {
 		logger.Printf("    Tags:\n")
 		for _, tag := range instance.Tags {

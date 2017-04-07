@@ -7,9 +7,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/NeowayLabs/cloud-machine/auth"
 	"github.com/NeowayLabs/cloud-machine/machine"
 	"github.com/NeowayLabs/cloud-machine/volume"
 	"github.com/NeowayLabs/logger"
+	"gopkg.in/amz.v3/aws"
 	"gopkg.in/amz.v3/ec2"
 	"gopkg.in/yaml.v2"
 )
@@ -41,6 +43,11 @@ type (
 		DefaultAvailableZone string // backward compatibility, use availablezone instead
 		Tags                 []ec2.Tag
 	}
+)
+
+var (
+	accessKey = flag.String("access-key", "", "AWS Access Key")
+	secretKey = flag.String("secret-key", "", "AWS Secret Key")
 )
 
 func main() {
@@ -147,9 +154,17 @@ func main() {
 		machines[key] = Cluster{Machine: machineConfig, Nodes: clusterConfig.Nodes}
 	}
 
-	auth, err := AwsAuth()
-	if err != nil {
-		logger.Fatal("Error reading aws credentials: %s", err.Error())
+	var authInfo aws.Auth
+
+	if *accessKey != "" && *secretKey != "" {
+		authInfo.AccessKey = *accessKey
+		authInfo.SecretKey = *secretKey
+	} else {
+		authInfo, err = auth.Aws()
+
+		if err != nil {
+			logger.Fatal("Error reading aws credentials: %s", err.Error())
+		}
 	}
 
 	machine.SetLogger(ioutil.Discard, "", 0)
@@ -174,7 +189,7 @@ func main() {
 			}
 
 			fmt.Printf("Running machine: %s\n", machineConfig.Instance.Name)
-			err = machine.Get(&machineConfig, auth)
+			err = machine.Get(&machineConfig, authInfo)
 			if err != nil {
 				logger.Fatal("Error getting machine: %s", err.Error())
 			}

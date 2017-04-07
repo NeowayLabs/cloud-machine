@@ -3,40 +3,68 @@
 # Cloud Machine
 
 This is a Go Project that should be used to create a cloud environment. The app
-will create volumes and instance through AWS, although in the next future it'll
-be possible use other backends like Microsoft Azure, Google Cloud Platform, etc.
+create volumes, ec2 instances, security groups, etc, on AWS.
 
-## How compile?
+## Using docker version
 
-The easier way to compile this project is getting
-[Docker](http://docs.docker.com/linux/step_one/) in your **Linux distribuition**.
+The easiest way to use `cloud-machine` is using [Docker](http://docs.docker.com/linux/step_one/) and the
+available
+[cloud-machine image](https://hub.docker.com/r/neowaylabs/cloud-machine/)
+issuing the following commands:
 
-#### Docker at Linux
-
-If you already have Docker installed in your Linux, you can simply type:
-```make```. Two files will be created in root directory of project:
-```machine-up``` and ```cluster-up```
-
-#### Other way
-
-If you have a Docker in other platforms (like MacOS X) you only can use it if
-you execute all commands inside of docker container, because the executables
-was compiled using Ubuntu. If execute all commands inside a Docker container is
-not a problem to you go ahead, otherwise you should install Go to compile them.
-
-To compile the project in your own platfomr, first you need
-[Go](http://golang.org), to install [click here](https://golang.org/doc/install).
-After that, you need to execute following commands, pay attention that we have
-two entry points (```machine-up.go``` and ```cluster-up.go```), because that
-we need to pass ```-d``` to ```go get```
-
+```sh
+$ docker pull neowaylabs/cloud-machine:latest
+$ docker run --rm -it -v <local-config-dir>:/data neowaylabs/cloud-machine:latest /machine-up -h
 ```
-export GOPATH=~/go # change to your go workspace
-go get -d github.com/NeowayLabs/cloud-machine
-cd $GOPATH/src/github.com/NeowayLabs/cloud-machine
-go build machine-up.go auth.go
-go build cluster-up.go auth.go
+
+The `<local-config-dir>` is some directory containing your
+infrastructure configurations (see section [How use?]). This place
+will be mapped to directory `/data` inside container.
+
+Then, a simple usage could be:
+
+```sh
+$ docker run --rm -it -v <local-config-dir>:/data \
+    neowaylabs/cloud-machine:latest \
+    /machine-up /data/mongo-node.yml
 ```
+
+## Compiling the sources
+
+To build `cloud-machine` you'll need [Go >= 1.4](https://golang.org/dl/) or
+use a docker image with Go installed. You can choose one of the
+following commands to build:
+
+```sh
+make build        # build using installed Go
+make build-docker # build using docker
+```
+
+After that, two binaries will be created:
+
+```sh
+$ ./cmd/machine-up/machine-up --help
+Usage of ./cmd/machine-up/machine-up:
+  -access-key string
+    	AWS Access Key
+  -secret-key string
+    	AWS Secret Key
+
+$ ./cmd/cluster-up/cluster-up --help
+Usage of ./cmd/cluster-up/cluster-up:
+  -access-key string
+    	AWS Access Key
+  -secret-key string
+    	AWS Secret Key
+```
+
+If you have Go installed, `make install` will install the binaries
+inside `$GOPATH/bin`.
+
+On OSX the binaries will not work if built with docker because the
+image they were compiled in is an ubuntu. The recommended way in this
+case are installing Go or issuing the commands directly inside the
+development docker image (`make shell-debug`)
 
 ## How use?
 
@@ -144,7 +172,7 @@ volumes:
 ```
 
 To run you need export AWS_ACCESS_KEY and AWS_SECRET_KEY or type ```aws configure``` and pass machine-config
-file 
+file
 
 ```
 export AWS_ACCESS_KEY=<your access key>
@@ -198,7 +226,7 @@ clusters:
 ```
 
 To run you need export AWS_ACCESS_KEY and AWS_SECRET_KEY or type ```aws configure``` and pass cluster-config
-file 
+file
 
 ```
 export AWS_ACCESS_KEY=<your access key>
@@ -208,7 +236,7 @@ export AWS_SECRET_KEY=<your secret key>
 
 aws configure
 
-./cluster-up ./cloud-machine/app-cluster.yml
+cluster-up ./cloud-machine/app-cluster.yml
 ```
 
 ## Publishing the image
